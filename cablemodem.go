@@ -25,10 +25,26 @@ type CableModemDeviceSettings struct {
 	NeverAsk bool
 }
 
+// CableModemAuthSettings contains Cable Modem Authentication settings.
+type CableModemAuthSettings struct {
+	// Hash of the current login.
+	CurrentLogin string
+	// Hash of the admin username.
+	CurrentNameAdmin string
+	// Hash of the current user's username.
+	CurrentNameUser string
+	// Hash of the admin password.
+	CurrentPasswordAdmin string
+	// Hash of the current user's password.
+	CurrentPasswordUser string
+}
+
 // CableModemStatus contains Cable Modem Status.
 type CableModemStatus struct {
 	// Device related information.
 	DeviceInfo CableModemDeviceInfo
 	// General settings.
 	DeviceSettings CableModemDeviceSettings
+	// Auth settings.
+	AuthSettings CableModemAuthSettings
 }

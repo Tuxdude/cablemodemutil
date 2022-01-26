@@ -23,6 +23,10 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = populateAuthSettings(status, &result.AuthSettings)
+	if err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
 
@@ -116,6 +120,35 @@ func populateDeviceSettings(status CableModemRawStatus, result *CableModemDevice
 		return err
 	}
 	result.NeverAsk, err = parseBool(reg, "NeverAsk", "1", "Never Ask")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Populates cable modem auth settings.
+func populateAuthSettings(status CableModemRawStatus, result *CableModemAuthSettings) error {
+	var err error
+	acc := actionResp(status["GetCustomerStatusSecAccountResponse"])
+
+	result.CurrentLogin, err = parseString(acc, "CurrentLogin", "Current Login")
+	if err != nil {
+		return err
+	}
+	result.CurrentNameAdmin, err = parseString(acc, "CurrentNameAdmin", "Current Admin Username")
+	if err != nil {
+		return err
+	}
+	result.CurrentNameUser, err = parseString(acc, "CurrentNameUser", "Current Username")
+	if err != nil {
+		return err
+	}
+	result.CurrentPasswordAdmin, err = parseString(acc, "CurrentPwAdmin", "Current Admin Password")
+	if err != nil {
+		return err
+	}
+	result.CurrentPasswordUser, err = parseString(acc, "CurrentPwUser", "Current User Password")
 	if err != nil {
 		return err
 	}
