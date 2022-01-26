@@ -2,6 +2,7 @@ package cablemodemutil
 
 import (
 	"fmt"
+	"time"
 )
 
 const (
@@ -31,4 +32,12 @@ func genPrivateKey(publicKey string, challenge string, clearPassword string) str
 // Generates the hashed password using the private key, challenge and the clear password.
 func genHashedPassword(privateKey string, challenge string, clearPassword string) string {
 	return genHMACMD5(privateKey, challenge)
+}
+
+// Generates the HNAP auth for the request.
+func genHNAPAuth(privateKey string, soapAction string) string {
+	currTime := time.Now().UnixMilli()
+	authMsg := fmt.Sprintf("%d%s", currTime, actionURI(soapAction))
+	auth := genHMACMD5(privateKey, authMsg)
+	return fmt.Sprintf("%s %d", auth, currTime)
 }
