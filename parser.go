@@ -27,6 +27,10 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = populateSoftwareStatus(status, &result.SoftwareStatus)
+	if err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
 
@@ -149,6 +153,34 @@ func populateAuthSettings(status CableModemRawStatus, result *CableModemAuthSett
 		return err
 	}
 	result.CurrentPasswordUser, err = parseString(acc, "CurrentPwUser", "Current User Password")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Populates cable modem software status.
+func populateSoftwareStatus(status CableModemRawStatus, result *CableModemSoftwareStatus) error {
+	var err error
+	sw := actionResp(status["GetCustomerStatusSoftwareResponse"])
+	result.FirmwareVersion, err = parseString(sw, "StatusSoftwareSfVer", "Firmware Version")
+	if err != nil {
+		return err
+	}
+	result.CertificateInstalled, err = parseBool(sw, "StatusSoftwareCertificate", "Installed", "Certificate Installed")
+	if err != nil {
+		return err
+	}
+	result.CustomerVersion, err = parseString(sw, "StatusSoftwareCustomerVer", "Customer Version")
+	if err != nil {
+		return err
+	}
+	result.HDVersion, err = parseString(sw, "StatusSoftwareHdVer", "HD Version")
+	if err != nil {
+		return err
+	}
+	result.DOCSISSpecVersion, err = parseString(sw, "StatusSoftwareSpecVer", "DOCSIS Spec Version")
 	if err != nil {
 		return err
 	}

@@ -39,6 +39,20 @@ type CableModemAuthSettings struct {
 	CurrentPasswordUser string
 }
 
+// CableModemSoftwareStatus contains Cable Modem Software status.
+type CableModemSoftwareStatus struct {
+	// Firmware version.
+	FirmwareVersion string
+	// True if certificate has been installed, false otherwise.
+	CertificateInstalled bool
+	// Customer version.
+	CustomerVersion string
+	// HD version.
+	HDVersion string
+	// DOCSIS specification version.
+	DOCSISSpecVersion string
+}
+
 // CableModemStatus contains Cable Modem Status.
 type CableModemStatus struct {
 	// Device related information.
@@ -47,4 +61,6 @@ type CableModemStatus struct {
 	DeviceSettings CableModemDeviceSettings
 	// Auth settings.
 	AuthSettings CableModemAuthSettings
+	// Software status.
+	SoftwareStatus CableModemSoftwareStatus
 }
