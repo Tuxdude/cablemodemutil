@@ -11,6 +11,40 @@ const (
 	urlFormat           = "%s://%s/HNAP1/"
 	tokenExpiryDuration = 10 * time.Minute
 	loginAction         = "Login"
+	queryAction         = "GetMultipleHNAPs"
+)
+
+var (
+	statusSubCommands = []string{
+		// MAC address, serial number and model info.
+		"GetArrisRegisterInfo",
+		// Software version info along with device MAC addr / serial.
+		"GetCustomerStatusSoftware",
+		// Short Device Status and signal info.
+		"GetArrisDeviceStatus",
+		// Current Time, uptime and short connection status.
+		"GetCustomerStatusConnectionInfo",
+		// Detailed connection status.
+		"GetCustomerStatusStartupSequence",
+		// Downstream channel info.
+		"GetCustomerStatusDownstreamChannelInfo",
+		// Upstream channel info.
+		"GetCustomerStatusUpstreamChannelInfo",
+		// Downstream/Upstream Frequency summary and configurable settings.
+		"GetArrisConfigurationInfo",
+		// Event log.
+		"GetCustomerStatusLog",
+		// User login/password information (Not so useful).
+		"GetCustomerStatusSecAccount",
+		// Ask me later and never ask (Not so useful).
+		"GetArrisRegisterStatus",
+		// Just contains 'XXX' (Not useful).
+		"GetCustomerStatusXXX",
+		// Just contains 'XXX' (Not useful).
+		"GetArrisXXX",
+		// Just contains 'XXX' (Not useful).
+		"GetCustomerStatusLogXXX",
+	}
 )
 
 // Retriever is used to retrieve the current status of the Cable Modem.
@@ -221,5 +255,20 @@ func (r *Retriever) login() (*token, error) {
 
 // Retrieves the current detailed raw status from the cable modem.
 func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
-	return nil, fmt.Errorf("unimplemented!")
+	payload := make(actionRequest)
+	for _, cmd := range statusSubCommands {
+		payload[cmd] = ""
+	}
+
+	tok, err := r.login()
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch the current status.
+	st, err := r.sendReq(queryAction, payload, tok)
+	if err != nil {
+		return nil, err
+	}
+	return CableModemRawStatus(st), nil
 }
