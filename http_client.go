@@ -16,10 +16,38 @@ const (
 	contentTypeHeaderValue = "application/json; charset=UTF-8"
 )
 
-// Adds the necessary headers to the HTTP request for the specified SOAP action.
-func addHeaders(req *http.Request, action string) {
+// Generate the list of cookies to be included in the request.
+func genCookies(tok *token) []*http.Cookie {
+	if tok.uid == "" {
+		// If uid is empty, it means we have not yet received a valid
+		// uid and the private key is the dummy initial value 'withoutLoginKey'.
+		return nil
+	}
+
+	return []*http.Cookie{
+		&http.Cookie{
+			Name:   "uid",
+			Value:  tok.uid,
+			Path:   "/",
+			Secure: true,
+		},
+		&http.Cookie{
+			Name:   "PrivateKey",
+			Value:  tok.privateKey,
+			Path:   "/",
+			Secure: true,
+		},
+	}
+}
+
+// Adds the necessary headers and cookies to the HTTP request for the specified SOAP action.
+func addHeadersAndCookies(req *http.Request, action string, tok *token) {
 	req.Header.Add(contentTypeHeader, contentTypeHeaderValue)
 	req.Header.Add(actionHeader, actionURI(action))
+	c := genCookies(tok)
+	for _, cookie := range c {
+		req.AddCookie(cookie)
+	}
 }
 
 type httpClient struct {
@@ -42,13 +70,13 @@ func newHttpClient(url string, skipVerifyCert bool) *httpClient {
 }
 
 // Sends the HTTP POST request for the specified SOAP action containing the specified payload.
-func (c *httpClient) sendPOST(action string, payload *bytes.Buffer) (*[]byte, error) {
+func (c *httpClient) sendPOST(action string, payload *bytes.Buffer, tok *token) (*[]byte, error) {
 	req, err := http.NewRequest("POST", c.url, payload)
 	if err != nil {
 		return nil, err
 	}
 
-	addHeaders(req, action)
+	addHeadersAndCookies(req, action, tok)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
