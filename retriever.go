@@ -180,6 +180,18 @@ func (r *Retriever) persistToken(tok *token) {
 	r.tokMu.Unlock()
 }
 
+// Retrieves a copy of the persisted token.
+func (r *Retriever) getToken() *token {
+	r.tokMu.Lock()
+	res := &token{
+		privateKey: r.tok.privateKey,
+		uid:        r.tok.uid,
+		expiry:     r.tok.expiry,
+	}
+	r.tokMu.Unlock()
+	return res
+}
+
 // Sends the SOAP request for the specified action containing the specified payload.
 func (r *Retriever) sendReq(action string, payload actionRequest, tok *token) (actionResponse, error) {
 	req := encodePayload(action, payload)
@@ -270,26 +282,44 @@ func (r *Retriever) login() (*token, error) {
 
 // Retrieves the current detailed raw status from the cable modem.
 func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
+	var err error
+	loginAttempted := false
 	payload := make(actionRequest)
 	for _, cmd := range statusSubCommands {
 		payload[cmd] = ""
 	}
 
-	tok, err := r.login()
-	if err != nil {
-		return nil, err
-	}
-	r.persistToken(tok)
+	tok := r.getToken()
+	for true {
+		// If the token has expired, login to generate a fresh token.
+		if time.Now().After(tok.expiry) {
+			loginAttempted = true
+			tok, err = r.login()
+			if err != nil {
+				return nil, err
+			}
+			r.persistToken(tok)
+		}
 
-	newExpiry := time.Now().Add(tokenExpiryDuration)
-	// Fetch the current status.
-	st, err := r.sendReq(queryAction, payload, tok)
-	if err == nil {
-		tok.expiry = newExpiry
-		r.persistToken(tok)
-		return CableModemRawStatus(st), nil
-	}
+		var st actionResponse
+		// Compute the new token expiry time based on when we send the request.
+		newExpiry := time.Now().Add(tokenExpiryDuration)
+		// Fetch the current status.
+		st, err = r.sendReq(queryAction, payload, tok)
+		if err == nil {
+			tok.expiry = newExpiry
+			r.persistToken(tok)
+			return CableModemRawStatus(st), nil
+		}
 
+		// If there is a failure in fetching the current status, and we
+		// didn't generate a fresh token just now, generate a new token
+		// and re-attempt fetching the current status.
+		if loginAttempted {
+			break
+		}
+		tok = resetToken()
+	}
 	return nil, err
 }
 
