@@ -95,6 +95,11 @@ func (c *httpClient) sendPOST(action string, payload *bytes.Buffer, tok *token) 
 	}
 
 	if resp.StatusCode != 200 {
+		// TODO: Convert this case into a specific error type that allows the
+		// caller to retry explicitly.
+		if resp.StatusCode == 404 && action == queryAction {
+			return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed with 404 status code possibly due to credentials having expired.\nbody:%s", action, string(body))
+		}
 		return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed due to non-success status code: %d\nbody:%s", action, resp.StatusCode, string(body))
 	}
 
