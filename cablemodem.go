@@ -1,5 +1,7 @@
 package cablemodemutil
 
+import "time"
+
 // CableModemRawStatus contains the raw status retrieved from the cable modem without any parsing.
 type CableModemRawStatus map[string]interface{}
 
@@ -107,6 +109,30 @@ type CableModemStartupStatus struct {
 	Security CableModemStartupSecurityStatus
 }
 
+// CableModemConnectionStatus contains Cable Modem Connection status.
+type CableModemConnectionStatus struct {
+	// Time at which connection was established (System Time - Up Time).
+	ConnectionEstablishedTime time.Time
+	// Current system time on the device.
+	SystemTime time.Time
+	// Duration for which the connection has been up.
+	UpTime time.Duration
+	// DOCSIS network access status.
+	DOCSISNetworkAccess string
+	// Internet connection status.
+	InternetConnectionStatus string
+	// Downstream plan for the connection.
+	DownstreamPlan string
+	// Primary Downstream channel frequency for the connection.
+	DownstreamFrequencyHZ uint32
+	// Primary Downstream channel signal power in dB mV.
+	DownstreamSignalPowerDBMV int32
+	// Primary Downstream channel signal SNR in dB.
+	DownstreamSignalSNRDB int32
+	// Primary upstream channel ID.
+	UpstreamChannelID uint8
+}
+
 // CableModemStatus contains Cable Modem Status.
 type CableModemStatus struct {
 	// Device related information.
@@ -119,4 +145,6 @@ type CableModemStatus struct {
 	SoftwareStatus CableModemSoftwareStatus
 	// Startup status.
 	StartupStatus CableModemStartupStatus
+	// Connection status.
+	ConnectionStatus CableModemConnectionStatus
 }

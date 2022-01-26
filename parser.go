@@ -35,6 +35,10 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = populateConnectionStatus(status, &result.ConnectionStatus)
+	if err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
 
@@ -237,5 +241,58 @@ func populateStartupStatus(status CableModemRawStatus, result *CableModemStartup
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// populates cable modem connection status.
+func populateConnectionStatus(status CableModemRawStatus, result *CableModemConnectionStatus) error {
+	var err error
+	conn := actionResp(status["GetCustomerStatusConnectionInfoResponse"])
+	dev := actionResp(status["GetArrisDeviceStatusResponse"])
+	config := actionResp(status["GetArrisConfigurationInfoResponse"])
+
+	result.SystemTime, err = parseSystemTimestamp(conn, "CustomerCurSystemTime", "Current System Time")
+	if err != nil {
+		return err
+	}
+	result.UpTime, err = parseDuration(conn, "CustomerConnSystemUpTime", "System Up Time")
+	if err != nil {
+		return err
+	}
+	result.ConnectionEstablishedTime = result.SystemTime.Add(-result.UpTime)
+	result.DOCSISNetworkAccess, err = parseString(conn, "CustomerConnNetworkAccess", "DOCSIS Network Access")
+	if err != nil {
+		return err
+	}
+	result.InternetConnectionStatus, err = parseString(dev, "InternetConnection", "Internet Connection Status")
+	if err != nil {
+		return err
+	}
+	result.DownstreamPlan, err = parseString(config, "DownstreamPlan", "Downstream Plan")
+	if err != nil {
+		return err
+	}
+	result.DownstreamFrequencyHZ, err = parseFreq(config, "DownstreamFrequency", false, "Downstream Frequency")
+	if err != nil {
+		return err
+	}
+	result.DownstreamSignalPowerDBMV, err = parseSignalPowerInt(dev, "DownstreamSignalPower", true, "Downstream Signal Power")
+	if err != nil {
+		return err
+	}
+	result.DownstreamSignalSNRDB, err = parseSignalSNR(dev, "DownstreamSignalSnr", true, "Downstream Signal SNR")
+	if err != nil {
+		return err
+	}
+	result.UpstreamChannelID, err = parseChannelID(config, "UpstreamChannelId", "Upstream Channel ID")
+	if err != nil {
+		return err
+	}
+
+	// TODO: Verify downstream frequency is the same in all three places below..
+	// GetArrisConfigurationInfoResponse.DownstreamFrequency (no HZ suffix in string)
+	// GetArrisDeviceStatusResponse.DownstreamFrequency (has HZ suffix in string)
+	// GetCustomerStatusStartupSequenceResponse.CustomerConnDSFreq (has HZ suffix in string)
+
 	return nil
 }
