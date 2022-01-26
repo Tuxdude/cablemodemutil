@@ -11,6 +11,7 @@ import (
 
 const (
 	actionHeader           = "SOAPAction"
+	hnapAuthHeader         = "HNAP_AUTH"
 	connectionTimeout      = 15
 	contentTypeHeader      = "Content-Type"
 	contentTypeHeaderValue = "application/json; charset=UTF-8"
@@ -44,6 +45,7 @@ func genCookies(tok *token) []*http.Cookie {
 func addHeadersAndCookies(req *http.Request, action string, tok *token) {
 	req.Header.Add(contentTypeHeader, contentTypeHeaderValue)
 	req.Header.Add(actionHeader, actionURI(action))
+	req.Header.Add(hnapAuthHeader, genHNAPAuth(tok.privateKey, action))
 	c := genCookies(tok)
 	for _, cookie := range c {
 		req.AddCookie(cookie)
