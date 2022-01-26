@@ -55,9 +55,10 @@ func addHeadersAndCookies(req *http.Request, action string, tok *token) {
 type httpClient struct {
 	client *http.Client
 	url    string
+	debug  *RetrieverDebug
 }
 
-func newHttpClient(url string, skipVerifyCert bool) *httpClient {
+func newHttpClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *httpClient {
 	c := httpClient{}
 	c.client = &http.Client{
 		Timeout: connectionTimeout * time.Second,
@@ -68,6 +69,7 @@ func newHttpClient(url string, skipVerifyCert bool) *httpClient {
 		}
 	}
 	c.url = url
+	c.debug = debug
 	return &c
 }
 
@@ -83,11 +85,22 @@ func (c *httpClient) sendPOST(action string, payload *bytes.Buffer, tok *token) 
 
 	addHeadersAndCookies(req, action, tok)
 
+	if c.debug.Debug {
+		fmt.Printf("Dumping token before the request: %s\n", action)
+		debugToken(tok)
+	}
+
+	if c.debug.DebugReq {
+		debugHTTPRequest(req)
+	}
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed.\nresp: %s\nreason: %w", action, prettyPrintJSON(resp), err)
 	}
 	defer resp.Body.Close()
+	if c.debug.DebugResp {
+		debugHTTPResponse(resp)
+	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

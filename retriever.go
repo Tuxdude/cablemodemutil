@@ -53,6 +53,7 @@ type Retriever struct {
 	client        *httpClient
 	username      string
 	clearPassword string
+	debug         *RetrieverDebug
 	tok           *token
 	tokMu         sync.Mutex
 }
@@ -69,6 +70,18 @@ type RetrieverInput struct {
 	Username string
 	// Password for authenticating with the cable modem.
 	ClearPassword string
+	// Debugging options.
+	Debug *RetrieverDebug
+}
+
+// RetrieverDebug is used to specify the debugging options of the Retriever.
+type RetrieverDebug struct {
+	// If set to true logs additional debug information except for the requests and responses sent/received to/from the cable modem, false otherwise.
+	Debug bool
+	// If set to true logs additional debug information about the requests sent to the cable modem, false otherwise.
+	DebugReq bool
+	// If set to true logs additional debug information about the resposnes received from the cable modem, false otherwise.
+	DebugResp bool
 }
 
 // The token object containing the state of the authenticated session with the cable modem.
@@ -162,9 +175,10 @@ func unpackResponse(action string, resp soapResponse) (actionResponse, error) {
 func NewStatusRetriever(input *RetrieverInput) *Retriever {
 	url := fmt.Sprintf(urlFormat, input.Protocol, input.Host)
 	r := Retriever{}
-	r.client = newHttpClient(url, input.SkipVerifyCert)
+	r.client = newHttpClient(url, input.SkipVerifyCert, input.Debug)
 	r.username = input.Username
 	r.clearPassword = input.ClearPassword
+	r.debug = input.Debug
 	r.tok = resetToken()
 	return &r
 }
@@ -178,6 +192,10 @@ func (r *Retriever) persistToken(tok *token) {
 		expiry:     tok.expiry,
 	}
 	r.tokMu.Unlock()
+	if r.debug.Debug {
+		fmt.Println("Persisting a new token.")
+		debugToken(tok)
+	}
 }
 
 // Retrieves a copy of the persisted token.
@@ -293,6 +311,10 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	for true {
 		// If the token has expired, login to generate a fresh token.
 		if time.Now().After(tok.expiry) {
+			if r.debug.Debug {
+				fmt.Println("Token expired, will attempt a new login.")
+				debugToken(tok)
+			}
 			loginAttempted = true
 			tok, err = r.login()
 			if err != nil {
