@@ -77,6 +77,9 @@ func (c *httpClient) sendPOST(action string, payload *bytes.Buffer, tok *token) 
 	if err != nil {
 		return nil, err
 	}
+	// Needed to avoid EOF errors.
+	// See https://stackoverflow.com/questions/17714494/golang-http-request-results-in-eof-errors-when-making-multiple-requests-successi
+	req.Close = true
 
 	addHeadersAndCookies(req, action, tok)
 
