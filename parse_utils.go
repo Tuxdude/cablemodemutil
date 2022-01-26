@@ -8,6 +8,8 @@ import (
 )
 
 const (
+	// DD/MM/YYYY HH:MM:SS
+	eventLogTimestampFormat = "2/1/2006 15:04:05"
 	// DAY MON DATE HH:MM:SS YYYY
 	systemTimestampFormat = "Mon Jan 2 15:04:05 2006"
 )
@@ -114,6 +116,21 @@ func parseChannelIDStr(str string, desc string) (uint8, error) {
 	return uint8(id), nil
 }
 
+// Parses the log timestamp from the specified date and time string values.
+func parseLogTimestamp(dateStr string, timeStr string) (time.Time, error) {
+	timestamp := fmt.Sprintf("%s %s", dateStr, timeStr)
+	// TODO: Do this one time instead of doing this for every call of this function.
+	loc, err := time.LoadLocation("Local")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("error loading \"Local\" location, reason: %w", err)
+	}
+	t, err := time.ParseInLocation(eventLogTimestampFormat, timestamp, loc)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("error parsing timestamp %q, reason: %w", timestamp, err)
+	}
+	return t, nil
+}
+
 // Parses the system timestamp from the specified timestamp string.
 func parseSystemTimestampStr(timestamp string, desc string) (time.Time, error) {
 	loc, err := time.LoadLocation("Local")
@@ -174,6 +191,12 @@ func parseTimeElementWithSuffix(str string, suffix string) (uint32, error) {
 	return uint32(num), nil
 }
 
+// Parses the specified log entry string.
+func parseLogEntry(str string) string {
+	// Just replace two spaces with one (seen commonly with login log entries).
+	return strings.ReplaceAll(str, "  ", " ")
+}
+
 // Parses the value of the specified key as a string in the specified status information.
 func parseString(data actionResponseBody, key string, desc string) (string, error) {
 	s, ok := data[key].(string)
@@ -208,6 +231,15 @@ func parseSignalPowerInt(data actionResponseBody, key string, hasDBMVSuffix bool
 		return 0, err
 	}
 	return parseSignalPowerIntStr(s, hasDBMVSuffix, desc)
+}
+
+// Parses the value of the specified key as a signal power floating point value in the specified status information.
+func parseSignalPowerFloat(data actionResponseBody, key string, hasDBMVSuffix bool, desc string) (float32, error) {
+	s, err := parseString(data, key, desc)
+	if err != nil {
+		return 0, err
+	}
+	return parseSignalPowerFloatStr(s, hasDBMVSuffix, desc)
 }
 
 // Parses the value of the specified key as a signal SNR integer value in the specified status information.

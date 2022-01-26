@@ -173,6 +173,14 @@ type CableModemConnectionStatus struct {
 	UpstreamChannels []CableModemUpstreamChannelInfo
 }
 
+// CableModemLogEntry contains Cable Modem Log entry.
+type CableModemLogEntry struct {
+	// Timestamp for this log entry.
+	Timestamp time.Time
+	// The log string in the entry.
+	Log string
+}
+
 // CableModemStatus contains Cable Modem Status.
 type CableModemStatus struct {
 	// Device related information.
@@ -187,4 +195,6 @@ type CableModemStatus struct {
 	StartupStatus CableModemStartupStatus
 	// Connection status.
 	ConnectionStatus CableModemConnectionStatus
+	// Logs.
+	Logs []CableModemLogEntry
 }

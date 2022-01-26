@@ -40,6 +40,10 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	result.Logs, err = populateLogEntries(status)
+	if err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
 
@@ -398,6 +402,46 @@ func populateUpstreamChannels(status CableModemRawStatus) ([]CableModemUpstreamC
 			return nil, err
 		}
 	}
+
+	return result, nil
+}
+
+// Populates cable modem log entries.
+func populateLogEntries(status CableModemRawStatus) ([]CableModemLogEntry, error) {
+	var err error
+	usInfo := actionResp(status["GetCustomerStatusLogResponse"])
+	squashedRows, err := parseString(usInfo, "CustomerStatusLogList", "Log list")
+	if err != nil {
+		return nil, err
+	}
+
+	// Each row is delimited by a '}-{'
+	rows := strings.Split(squashedRows, "}-{")
+	result := make([]CableModemLogEntry, len(rows))
+	for i, row := range rows {
+		// Each column is delimited by a '^'
+		cols := strings.Split(row, "^")
+		// The columns are:
+		// 0, Time, Date, 3, Log
+		if len(cols) != 5 {
+			return nil, fmt.Errorf("expected 5 columns in a log entry, actual %d row=%q", len(cols), row)
+		}
+
+		result[i].Timestamp, err = parseLogTimestamp(cols[2], cols[1])
+		if err != nil {
+			return nil, err
+		}
+		result[i].Log = parseLogEntry(cols[4])
+	}
+
+	// TODO:
+	// 1. Count number of success/failed login attempts.
+	//		  Expose timestamps and IPs of successful and failed login attempts.
+	// 2. Count other kinds of errors (three known categories so far)
+	//        STARTED_UNICAST_MAINTENANCE_RANGING_NO_RESPONSE_RECEIVED
+	//        RNG_RSP_CCAP_COMMAND_POWER_EXCEEDS_TOP_OF_DRW
+	//        DYNAMIC_RANGE_WINDOW_VIOLATION
+	// 3. Parse CMTS MAC from the latest log entry with the info (if available).
 
 	return result, nil
 }
