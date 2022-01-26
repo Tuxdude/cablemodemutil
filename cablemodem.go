@@ -53,6 +53,60 @@ type CableModemSoftwareStatus struct {
 	DOCSISSpecVersion string
 }
 
+// CableModemStartupBootStatus contains Cable Modem Startup Boot status.
+type CableModemStartupBootStatus struct {
+	// Boot status.
+	Status string
+	// Comments.
+	Comment string
+}
+
+// CableModemStartupConfigurationFileStatus contains Cable Modem Startup Configuration file status.
+type CableModemStartupConfigurationFileStatus struct {
+	// Configuration file status.
+	Status string
+	// Comments.
+	Comment string
+}
+
+// CableModemStartupConnectivityStatus contains Cable Modem Startup Connectivity status.
+type CableModemStartupConnectivityStatus struct {
+	// Connectivity status.
+	Status string
+	// Comments.
+	Comment string
+}
+
+// CableModemStartupDownstreamConnectionStatus contains Cable Modem Startup Downstream Connection status.
+type CableModemStartupDownstreamConnectionStatus struct {
+	// Frequency in Hz for the Downstream channel connection.
+	FrequencyHZ uint32
+	// Comments.
+	Comment string
+}
+
+// CableModemStartupSecurityStatus contains Cable Modem Startup Security status.
+type CableModemStartupSecurityStatus struct {
+	// Security status.
+	Status string
+	// Comments.
+	Comment string
+}
+
+// CableModemStartupStatus contains Cable Modem Startup Status.
+type CableModemStartupStatus struct {
+	// Boot status.
+	Boot CableModemStartupBootStatus
+	// Configuration file status.
+	ConfigurationFile CableModemStartupConfigurationFileStatus
+	// Connectivity status.
+	Connectivity CableModemStartupConnectivityStatus
+	// Downstream connection status.
+	DownstreamConnection CableModemStartupDownstreamConnectionStatus
+	// Security status.
+	Security CableModemStartupSecurityStatus
+}
+
 // CableModemStatus contains Cable Modem Status.
 type CableModemStatus struct {
 	// Device related information.
@@ -63,4 +117,6 @@ type CableModemStatus struct {
 	AuthSettings CableModemAuthSettings
 	// Software status.
 	SoftwareStatus CableModemSoftwareStatus
+	// Startup status.
+	StartupStatus CableModemStartupStatus
 }

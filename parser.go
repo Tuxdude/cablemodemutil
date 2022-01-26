@@ -31,6 +31,10 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = populateStartupStatus(status, &result.StartupStatus)
+	if err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
 
@@ -185,5 +189,53 @@ func populateSoftwareStatus(status CableModemRawStatus, result *CableModemSoftwa
 		return err
 	}
 
+	return nil
+}
+
+// Populates cable modem startup status.
+func populateStartupStatus(status CableModemRawStatus, result *CableModemStartupStatus) error {
+	var err error
+	startup := actionResp(status["GetCustomerStatusStartupSequenceResponse"])
+
+	result.Boot.Status, err = parseString(startup, "CustomerConnBootStatus", "Boot Status")
+	if err != nil {
+		return err
+	}
+	result.Boot.Comment, err = parseString(startup, "CustomerConnBootComment", "Boot Comment")
+	if err != nil {
+		return err
+	}
+	result.ConfigurationFile.Status, err = parseString(startup, "CustomerConnConfigurationFileStatus", "Configuration File Status")
+	if err != nil {
+		return err
+	}
+	result.ConfigurationFile.Comment, err = parseString(startup, "CustomerConnConfigurationFileComment", "Configuration File Comment")
+	if err != nil {
+		return err
+	}
+	result.Connectivity.Status, err = parseString(startup, "CustomerConnConnectivityStatus", "Connectivity Status")
+	if err != nil {
+		return err
+	}
+	result.Connectivity.Comment, err = parseString(startup, "CustomerConnConnectivityComment", "Connectivity Comment")
+	if err != nil {
+		return err
+	}
+	result.DownstreamConnection.FrequencyHZ, err = parseFreq(startup, "CustomerConnDSFreq", true, "Downstream Connection Frequency")
+	if err != nil {
+		return err
+	}
+	result.DownstreamConnection.Comment, err = parseString(startup, "CustomerConnDSComment", "Downstream Connection Comment")
+	if err != nil {
+		return err
+	}
+	result.Security.Status, err = parseString(startup, "CustomerConnSecurityStatus", "Security Status")
+	if err != nil {
+		return err
+	}
+	result.Security.Comment, err = parseString(startup, "CustomerConnSecurityComment", "Security Comment")
+	if err != nil {
+		return err
+	}
 	return nil
 }
