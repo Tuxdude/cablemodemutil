@@ -44,6 +44,22 @@ func parseInt64(str string, hasSuffix bool, suffix string, desc string) (int64, 
 	return res, nil
 }
 
+// Parses the specified string as a float64 after stripping the suffix if required.
+func parseFloat64(str string, hasSuffix bool, suffix string, desc string) (float64, error) {
+	if hasSuffix {
+		if !strings.HasSuffix(str, suffix) {
+			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
+		}
+		str = strings.TrimSuffix(str, suffix)
+	}
+
+	res, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return 0, fmt.Errorf("unable to convert %q to float64: %w", str, err)
+	}
+	return res, nil
+}
+
 // Parses the specified string as a channel frequency after stripping the ' Hz' suffix if required.
 func parseFreqStr(str string, hasHzSuffix bool, desc string) (uint32, error) {
 	f, err := parseUint64(str, hasHzSuffix, " Hz", desc)
@@ -62,6 +78,15 @@ func parseSignalPowerIntStr(str string, hasDBMVSuffix bool, desc string) (int32,
 	return int32(pow), nil
 }
 
+// Parses the specified string as a signal power floating point value after stripping the ' dBmV' suffix if required.
+func parseSignalPowerFloatStr(str string, hasDBMVSuffix bool, desc string) (float32, error) {
+	pow, err := parseFloat64(str, hasDBMVSuffix, " dBmV", desc)
+	if err != nil {
+		return 0, err
+	}
+	return float32(pow), nil
+}
+
 // Parses the specified string as a signal SNR integer value after stripping the ' dB' suffix if required.
 func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (int32, error) {
 	snr, err := parseInt64(str, hasDBSuffix, " dB", desc)
@@ -69,6 +94,15 @@ func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (int32, error)
 		return 0, err
 	}
 	return int32(snr), nil
+}
+
+// Parses the specified string as a signal errors integer value.
+func parseSignalErrorsStr(str string, desc string) (uint32, error) {
+	count, err := parseUint64(str, false, "", desc)
+	if err != nil {
+		return 0, err
+	}
+	return uint32(count), nil
 }
 
 // Parses the specified string as a channel ID value.
@@ -183,6 +217,15 @@ func parseSignalSNR(data actionResponseBody, key string, hasDBSuffix bool, desc 
 		return 0, err
 	}
 	return parseSignalSNRStr(s, hasDBSuffix, desc)
+}
+
+// Parses the value of the specified key as a signal errors integer value in the specified status information.
+func parseSignalErrors(data actionResponseBody, key string, desc string) (uint32, error) {
+	s, err := parseString(data, key, desc)
+	if err != nil {
+		return 0, err
+	}
+	return parseSignalErrorsStr(s, desc)
 }
 
 // Parses the value of the specified key as a channel ID integer value in the specified status information.

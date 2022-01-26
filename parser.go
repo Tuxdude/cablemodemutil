@@ -3,6 +3,7 @@ package cablemodemutil
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 type actionResponseBody map[string]interface{}
@@ -288,6 +289,14 @@ func populateConnectionStatus(status CableModemRawStatus, result *CableModemConn
 	if err != nil {
 		return err
 	}
+	result.DownstreamChannels, err = populateDownstreamChannels(status)
+	if err != nil {
+		return err
+	}
+	result.UpstreamChannels, err = populateUpstreamChannels(status)
+	if err != nil {
+		return err
+	}
 
 	// TODO: Verify downstream frequency is the same in all three places below..
 	// GetArrisConfigurationInfoResponse.DownstreamFrequency (no HZ suffix in string)
@@ -295,4 +304,100 @@ func populateConnectionStatus(status CableModemRawStatus, result *CableModemConn
 	// GetCustomerStatusStartupSequenceResponse.CustomerConnDSFreq (has HZ suffix in string)
 
 	return nil
+}
+
+// Populates cable modem downstream channel information.
+func populateDownstreamChannels(status CableModemRawStatus) ([]CableModemDownstreamChannelInfo, error) {
+	var err error
+	dsInfo := actionResp(status["GetCustomerStatusDownstreamChannelInfoResponse"])
+	squashedRows, err := parseString(dsInfo, "CustomerConnDownstreamChannel", "Downstream Channel info")
+	if err != nil {
+		return nil, err
+	}
+
+	// Each row is delimited by a '|+|'
+	rows := strings.Split(squashedRows, "|+|")
+	result := make([]CableModemDownstreamChannelInfo, len(rows))
+	for i, row := range rows {
+		// Each column is delimited by a '^'
+		cols := strings.Split(row, "^")
+		// The columns are:
+		// Row ID, Lock Status, Modulation, Channel ID, Frequency, Power, SNR, Corrected Err, Uncorrected Err, Blank
+		if len(cols) != 10 {
+			return nil, fmt.Errorf("expected 10 columns in a downstream channel, actual %d row=%q", len(cols), row)
+		}
+
+		result[i].LockStatus = cols[1]
+		result[i].Modulation = cols[2]
+		result[i].ChannelID, err = parseChannelIDStr(cols[3], "Downstream Channel ID")
+		if err != nil {
+			return nil, err
+		}
+		result[i].FrequencyHZ, err = parseFreqStr(cols[4], false, "Downstream Channel Frequency")
+		if err != nil {
+			return nil, err
+		}
+		result[i].SignalPowerDBMV, err = parseSignalPowerIntStr(cols[5], false, "Downstream Channel Signal Power")
+		if err != nil {
+			return nil, err
+		}
+		result[i].SignalSNRMERDB, err = parseSignalSNRStr(cols[6], false, "Downstream Channel Signal SNR/MER")
+		if err != nil {
+			return nil, err
+		}
+		result[i].CorrectedErrors, err = parseSignalErrorsStr(cols[7], "Downstream Channel Signal Corrected Errors")
+		if err != nil {
+			return nil, err
+		}
+		result[i].UncorrectedErrors, err = parseSignalErrorsStr(cols[8], "Downstream Channel Signal Uncorrected Errors")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
+// Populates cable modem upstream channel information.
+func populateUpstreamChannels(status CableModemRawStatus) ([]CableModemUpstreamChannelInfo, error) {
+	var err error
+	usInfo := actionResp(status["GetCustomerStatusUpstreamChannelInfoResponse"])
+	squashedRows, err := parseString(usInfo, "CustomerConnUpstreamChannel", "Upstream Channel info")
+	if err != nil {
+		return nil, err
+	}
+
+	// Each row is delimited by a '|+|'
+	rows := strings.Split(squashedRows, "|+|")
+	result := make([]CableModemUpstreamChannelInfo, len(rows))
+	for i, row := range rows {
+		// Each column is delimited by a '^'
+		cols := strings.Split(row, "^")
+		// The columns are:
+		// Row ID, Lock Status, Modulation, Channel ID, Width, Frequency, Power, Blank
+		if len(cols) != 8 {
+			return nil, fmt.Errorf("expected 8 columns in a upstream channel, actual %d row=%q", len(cols), row)
+		}
+
+		result[i].LockStatus = cols[1]
+		result[i].Modulation = cols[2]
+		result[i].ChannelID, err = parseChannelIDStr(cols[3], "Upstream Channel ID")
+		if err != nil {
+			return nil, err
+		}
+		result[i].WidthHZ, err = parseFreqStr(cols[4], false, "Upstream Channel Width")
+		if err != nil {
+			return nil, err
+		}
+		result[i].FrequencyHZ, err = parseFreqStr(cols[5], false, "Upstream Channel Frequency")
+		if err != nil {
+			return nil, err
+		}
+		result[i].SignalPowerDBMV, err = parseSignalPowerFloatStr(cols[6], false, "Upstream Channel Signal Power")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }

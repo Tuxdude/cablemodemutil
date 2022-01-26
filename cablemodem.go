@@ -55,6 +55,42 @@ type CableModemSoftwareStatus struct {
 	DOCSISSpecVersion string
 }
 
+// CableModemDownstreamChannelInfo contains Cable Modem Downstream channel information.
+type CableModemDownstreamChannelInfo struct {
+	// Lock status.
+	LockStatus string
+	// Modulation.
+	Modulation string
+	// Channel ID.
+	ChannelID uint8
+	// Frequency of the channel in Hz.
+	FrequencyHZ uint32
+	// Signal Power in dB mV.
+	SignalPowerDBMV int32
+	// Signal SNR/MER in dB.
+	SignalSNRMERDB int32
+	// Corrected errors.
+	CorrectedErrors uint32
+	// Uncorrected errors.
+	UncorrectedErrors uint32
+}
+
+// CableModemUpstreamChannelInfo contains Cable Modem Upstream channel information.
+type CableModemUpstreamChannelInfo struct {
+	// Lock status.
+	LockStatus string
+	// Modulation.
+	Modulation string
+	// Channel ID.
+	ChannelID uint8
+	// Width of the channel in Hz.
+	WidthHZ uint32
+	// Frequency of the channel in Hz.
+	FrequencyHZ uint32
+	// Signal Power in dB mV.
+	SignalPowerDBMV float32
+}
+
 // CableModemStartupBootStatus contains Cable Modem Startup Boot status.
 type CableModemStartupBootStatus struct {
 	// Boot status.
@@ -131,6 +167,10 @@ type CableModemConnectionStatus struct {
 	DownstreamSignalSNRDB int32
 	// Primary upstream channel ID.
 	UpstreamChannelID uint8
+	// Downstream channel information.
+	DownstreamChannels []CableModemDownstreamChannelInfo
+	// Upstream channel information.
+	UpstreamChannels []CableModemUpstreamChannelInfo
 }
 
 // CableModemStatus contains Cable Modem Status.
