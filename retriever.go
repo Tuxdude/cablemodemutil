@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -52,6 +53,8 @@ type Retriever struct {
 	client        *httpClient
 	username      string
 	clearPassword string
+	tok           *token
+	tokMu         sync.Mutex
 }
 
 // RetrieverInput is used to specify the input for building a Retriever.
@@ -162,7 +165,19 @@ func NewStatusRetriever(input *RetrieverInput) *Retriever {
 	r.client = newHttpClient(url, input.SkipVerifyCert)
 	r.username = input.Username
 	r.clearPassword = input.ClearPassword
+	r.tok = resetToken()
 	return &r
+}
+
+// Persist the token in the object.
+func (r *Retriever) persistToken(tok *token) {
+	r.tokMu.Lock()
+	r.tok = &token{
+		privateKey: tok.privateKey,
+		uid:        tok.uid,
+		expiry:     tok.expiry,
+	}
+	r.tokMu.Unlock()
 }
 
 // Sends the SOAP request for the specified action containing the specified payload.
@@ -264,13 +279,18 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	r.persistToken(tok)
 
+	newExpiry := time.Now().Add(tokenExpiryDuration)
 	// Fetch the current status.
 	st, err := r.sendReq(queryAction, payload, tok)
-	if err != nil {
-		return nil, err
+	if err == nil {
+		tok.expiry = newExpiry
+		r.persistToken(tok)
+		return CableModemRawStatus(st), nil
 	}
-	return CableModemRawStatus(st), nil
+
+	return nil, err
 }
 
 // Retrieves and parses the current detailed status from the cable modem.
