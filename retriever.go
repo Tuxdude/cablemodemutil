@@ -179,6 +179,24 @@ func (r *Retriever) getLoginResponse() (*loginResponse, error) {
 	return &result, nil
 }
 
+// Performs authentication with the cable modem and returns the response.
+func (r *Retriever) doAuth(challenge string, tok *token) error {
+	hashedPassword := genHashedPassword(tok.privateKey, challenge, r.clearPassword)
+	payload := actionRequest{
+		"LoginPassword": hashedPassword,
+		"Captcha":       "",
+		"PrivateLogin":  "LoginPassword",
+		"Action":        "login",
+		"Username":      r.username,
+	}
+
+	_, err := r.sendReq(loginAction, payload, tok)
+	if err != nil {
+		return fmt.Errorf("login failed.\nreason: %w", err)
+	}
+	return nil
+}
+
 // Login to the cable modem using the specified username and password.
 func (r *Retriever) login() (*token, error) {
 	loginResp, err := r.getLoginResponse()
@@ -193,6 +211,10 @@ func (r *Retriever) login() (*token, error) {
 		uid:        loginResp.uid,
 		privateKey: privateKey,
 		expiry:     expiry,
+	}
+	err = r.doAuth(loginResp.challenge, tok)
+	if err != nil {
+		return nil, fmt.Errorf("login failed.\nreason: %w", err)
 	}
 	return tok, nil
 }
