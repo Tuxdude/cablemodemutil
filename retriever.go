@@ -272,3 +272,12 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	}
 	return CableModemRawStatus(st), nil
 }
+
+// Retrieves and parses the current detailed status from the cable modem.
+func (r *Retriever) Status() (*CableModemStatus, error) {
+	raw, err := r.RawStatus()
+	if err != nil {
+		return nil, err
+	}
+	return ParseRawStatus(raw)
+}
