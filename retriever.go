@@ -2,6 +2,7 @@ package cablemodemutil
 
 import (
 	"fmt"
+	"time"
 )
 
 const (
@@ -27,6 +28,23 @@ type RetrieverInput struct {
 	Username string
 	// Password for authenticating with the cable modem.
 	ClearPassword string
+}
+
+// The token object containing the state of the authenticated session with the cable modem.
+type token struct {
+	// The UID of the session provided by the cable modem during authentication.
+	uid string
+	// The private key of the session after authentication, generated based on public key, challenge from the cable modem and the supplied password.
+	privateKey string
+	// The expiry timestamp of the credentials stored in this session.
+	expiry time.Time
+}
+
+// Returns a token that has been reset to the initial state.
+func resetToken() *token {
+	return &token{
+		privateKey: "withoutLoginKey",
+	}
 }
 
 // Builds a new Retriever object to query the Cable Modem.
