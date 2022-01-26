@@ -13,8 +13,22 @@ type CableModemDeviceInfo struct {
 	MACAddress string
 }
 
+// CableModemDeviceSettings contains Cable Modem Device settings.
+type CableModemDeviceSettings struct {
+	// True if front panel LED lights are configured to be on, false otherwise.
+	FrontPanelLightsOn bool
+	// True if energy efficient ethernet setting is turned on, false otherwise.
+	EnergyEfficientEthernetOn bool
+	// True if ask me later setting has been opted into, false otherwise.
+	AskMeLater bool
+	// True if never ask setting has been opted into, false otherwise.
+	NeverAsk bool
+}
+
 // CableModemStatus contains Cable Modem Status.
 type CableModemStatus struct {
 	// Device related information.
 	DeviceInfo CableModemDeviceInfo
+	// General settings.
+	DeviceSettings CableModemDeviceSettings
 }

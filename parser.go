@@ -19,6 +19,10 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = populateDeviceSettings(status, &result.DeviceSettings)
+	if err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
 
@@ -90,5 +94,31 @@ func populateDeviceInfo(status CableModemRawStatus, result *CableModemDeviceInfo
 
 	warnIfMismatch(status, "Serial Number", "GetArrisRegisterInfoResponse", "SerialNumber", map[string]string{"GetCustomerStatusSoftwareResponse": "StatusSoftwareSerialNum"})
 	warnIfMismatch(status, "MAC Address", "GetArrisRegisterInfoResponse", "MacAddress", map[string]string{"GetCustomerStatusSoftwareResponse": "StatusSoftwareMac"})
+	return nil
+}
+
+// Populates cable modem device settings.
+func populateDeviceSettings(status CableModemRawStatus, result *CableModemDeviceSettings) error {
+	var err error
+	conf := actionResp(status["GetArrisConfigurationInfoResponse"])
+	reg := actionResp(status["GetArrisRegisterStatusResponse"])
+
+	result.FrontPanelLightsOn, err = parseBool(conf, "LedStatus", "1", "LED Status")
+	if err != nil {
+		return err
+	}
+	result.EnergyEfficientEthernetOn, err = parseBool(conf, "ethSWEthEEE", "1", "Energy Efficient Ethernet")
+	if err != nil {
+		return err
+	}
+	result.AskMeLater, err = parseBool(reg, "AskMeLater", "1", "Ask Me Later")
+	if err != nil {
+		return err
+	}
+	result.NeverAsk, err = parseBool(reg, "NeverAsk", "1", "Never Ask")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

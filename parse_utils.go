@@ -12,3 +12,12 @@ func parseString(data actionResponseBody, key string, desc string) (string, erro
 	}
 	return s, nil
 }
+
+// Parses the value of the specified key as a bool in the specified status information.
+func parseBool(data actionResponseBody, key string, trueVal string, desc string) (bool, error) {
+	s, err := parseString(data, key, desc)
+	if err != nil {
+		return false, err
+	}
+	return s == trueVal, nil
+}
