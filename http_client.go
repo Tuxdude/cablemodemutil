@@ -26,13 +26,13 @@ func genCookies(tok *token) []*http.Cookie {
 	}
 
 	return []*http.Cookie{
-		&http.Cookie{
+		{
 			Name:   "uid",
 			Value:  tok.uid,
 			Path:   "/",
 			Secure: true,
 		},
-		&http.Cookie{
+		{
 			Name:   "PrivateKey",
 			Value:  tok.privateKey,
 			Path:   "/",
