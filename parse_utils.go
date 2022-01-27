@@ -14,8 +14,8 @@ const (
 	systemTimestampFormat = "Mon Jan 2 15:04:05 2006"
 )
 
-// Parses the specified string as an uint64 after stripping the suffix if required.
-func parseUint64(str string, hasSuffix bool, suffix string, desc string) (uint64, error) {
+// Parses the specified string as an uint32 after stripping the suffix if required.
+func parseUint32(str string, hasSuffix bool, suffix string, desc string) (uint32, error) {
 	if hasSuffix {
 		if !strings.HasSuffix(str, suffix) {
 			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
@@ -23,15 +23,15 @@ func parseUint64(str string, hasSuffix bool, suffix string, desc string) (uint64
 		str = strings.TrimSuffix(str, suffix)
 	}
 
-	res, err := strconv.ParseUint(str, 10, 64)
+	res, err := strconv.ParseUint(str, 10, 32)
 	if err != nil {
 		return 0, fmt.Errorf("unable to convert %q to uint64: %w", str, err)
 	}
-	return res, nil
+	return uint32(res), nil
 }
 
-// Parses the specified string as an int64 after stripping the suffix if required.
-func parseInt64(str string, hasSuffix bool, suffix string, desc string) (int64, error) {
+// Parses the specified string as an uint8 after stripping the suffix if required.
+func parseUint8(str string, hasSuffix bool, suffix string, desc string) (uint8, error) {
 	if hasSuffix {
 		if !strings.HasSuffix(str, suffix) {
 			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
@@ -39,11 +39,27 @@ func parseInt64(str string, hasSuffix bool, suffix string, desc string) (int64, 
 		str = strings.TrimSuffix(str, suffix)
 	}
 
-	res, err := strconv.ParseInt(str, 10, 64)
+	res, err := strconv.ParseUint(str, 10, 8)
+	if err != nil {
+		return 0, fmt.Errorf("unable to convert %q to uint64: %w", str, err)
+	}
+	return uint8(res), nil
+}
+
+// Parses the specified string as an int32 after stripping the suffix if required.
+func parseInt32(str string, hasSuffix bool, suffix string, desc string) (int32, error) {
+	if hasSuffix {
+		if !strings.HasSuffix(str, suffix) {
+			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
+		}
+		str = strings.TrimSuffix(str, suffix)
+	}
+
+	res, err := strconv.ParseInt(str, 10, 32)
 	if err != nil {
 		return 0, fmt.Errorf("unable to convert %q to int64: %w", str, err)
 	}
-	return res, nil
+	return int32(res), nil
 }
 
 // Parses the specified string as a float64 after stripping the suffix if required.
@@ -64,7 +80,7 @@ func parseFloat64(str string, hasSuffix bool, suffix string, desc string) (float
 
 // Parses the specified string as a channel frequency after stripping the ' Hz' suffix if required.
 func parseFreqStr(str string, hasHzSuffix bool, desc string) (uint32, error) {
-	f, err := parseUint64(str, hasHzSuffix, " Hz", desc)
+	f, err := parseUint32(str, hasHzSuffix, " Hz", desc)
 	if err != nil {
 		return 0, err
 	}
@@ -73,7 +89,7 @@ func parseFreqStr(str string, hasHzSuffix bool, desc string) (uint32, error) {
 
 // Parses the specified string as a signal power integer value after stripping the ' dBmV' suffix if required.
 func parseSignalPowerIntStr(str string, hasDBMVSuffix bool, desc string) (int32, error) {
-	pow, err := parseInt64(str, hasDBMVSuffix, " dBmV", desc)
+	pow, err := parseInt32(str, hasDBMVSuffix, " dBmV", desc)
 	if err != nil {
 		return 0, err
 	}
@@ -91,7 +107,7 @@ func parseSignalPowerFloatStr(str string, hasDBMVSuffix bool, desc string) (floa
 
 // Parses the specified string as a signal SNR integer value after stripping the ' dB' suffix if required.
 func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (int32, error) {
-	snr, err := parseInt64(str, hasDBSuffix, " dB", desc)
+	snr, err := parseInt32(str, hasDBSuffix, " dB", desc)
 	if err != nil {
 		return 0, err
 	}
@@ -100,7 +116,7 @@ func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (int32, error)
 
 // Parses the specified string as a signal errors integer value.
 func parseSignalErrorsStr(str string, desc string) (uint32, error) {
-	count, err := parseUint64(str, false, "", desc)
+	count, err := parseUint32(str, false, "", desc)
 	if err != nil {
 		return 0, err
 	}
@@ -109,7 +125,7 @@ func parseSignalErrorsStr(str string, desc string) (uint32, error) {
 
 // Parses the specified string as a channel ID value.
 func parseChannelIDStr(str string, desc string) (uint8, error) {
-	id, err := parseUint64(str, false, "", desc)
+	id, err := parseUint8(str, false, "", desc)
 	if err != nil {
 		return 0, err
 	}
