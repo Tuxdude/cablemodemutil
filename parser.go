@@ -96,7 +96,7 @@ func warnIfMismatch(status CableModemRawStatus, desc string, expectedKey string,
 }
 
 // Populates cable modem device information.
-func populateDeviceInfo(status CableModemRawStatus, result *CableModemDeviceInfo) error {
+func populateDeviceInfo(status CableModemRawStatus, result *DeviceInfo) error {
 	var err error
 	data := actionResp(status["GetArrisRegisterInfoResponse"])
 
@@ -119,7 +119,7 @@ func populateDeviceInfo(status CableModemRawStatus, result *CableModemDeviceInfo
 }
 
 // Populates cable modem device settings.
-func populateDeviceSettings(status CableModemRawStatus, result *CableModemDeviceSettings) error {
+func populateDeviceSettings(status CableModemRawStatus, result *DeviceSettings) error {
 	var err error
 	conf := actionResp(status["GetArrisConfigurationInfoResponse"])
 	reg := actionResp(status["GetArrisRegisterStatusResponse"])
@@ -145,7 +145,7 @@ func populateDeviceSettings(status CableModemRawStatus, result *CableModemDevice
 }
 
 // Populates cable modem auth settings.
-func populateAuthSettings(status CableModemRawStatus, result *CableModemAuthSettings) error {
+func populateAuthSettings(status CableModemRawStatus, result *AuthSettings) error {
 	var err error
 	acc := actionResp(status["GetCustomerStatusSecAccountResponse"])
 
@@ -174,7 +174,7 @@ func populateAuthSettings(status CableModemRawStatus, result *CableModemAuthSett
 }
 
 // Populates cable modem software status.
-func populateSoftwareStatus(status CableModemRawStatus, result *CableModemSoftwareStatus) error {
+func populateSoftwareStatus(status CableModemRawStatus, result *SoftwareStatus) error {
 	var err error
 	sw := actionResp(status["GetCustomerStatusSoftwareResponse"])
 	result.FirmwareVersion, err = parseString(sw, "StatusSoftwareSfVer", "Firmware Version")
@@ -202,7 +202,7 @@ func populateSoftwareStatus(status CableModemRawStatus, result *CableModemSoftwa
 }
 
 // Populates cable modem startup status.
-func populateStartupStatus(status CableModemRawStatus, result *CableModemStartupStatus) error {
+func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) error {
 	var err error
 	startup := actionResp(status["GetCustomerStatusStartupSequenceResponse"])
 
@@ -250,7 +250,7 @@ func populateStartupStatus(status CableModemRawStatus, result *CableModemStartup
 }
 
 // populates cable modem connection status.
-func populateConnectionStatus(status CableModemRawStatus, result *CableModemConnectionStatus) error {
+func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStatus) error {
 	var err error
 	conn := actionResp(status["GetCustomerStatusConnectionInfoResponse"])
 	dev := actionResp(status["GetArrisDeviceStatusResponse"])
@@ -311,7 +311,7 @@ func populateConnectionStatus(status CableModemRawStatus, result *CableModemConn
 }
 
 // Populates cable modem downstream channel information.
-func populateDownstreamChannels(status CableModemRawStatus) ([]CableModemDownstreamChannelInfo, error) {
+func populateDownstreamChannels(status CableModemRawStatus) ([]DownstreamChannelInfo, error) {
 	var err error
 	dsInfo := actionResp(status["GetCustomerStatusDownstreamChannelInfoResponse"])
 	squashedRows, err := parseString(dsInfo, "CustomerConnDownstreamChannel", "Downstream Channel info")
@@ -321,7 +321,7 @@ func populateDownstreamChannels(status CableModemRawStatus) ([]CableModemDownstr
 
 	// Each row is delimited by a '|+|'
 	rows := strings.Split(squashedRows, "|+|")
-	result := make([]CableModemDownstreamChannelInfo, len(rows))
+	result := make([]DownstreamChannelInfo, len(rows))
 	for i, row := range rows {
 		// Each column is delimited by a '^'
 		cols := strings.Split(row, "^")
@@ -363,7 +363,7 @@ func populateDownstreamChannels(status CableModemRawStatus) ([]CableModemDownstr
 }
 
 // Populates cable modem upstream channel information.
-func populateUpstreamChannels(status CableModemRawStatus) ([]CableModemUpstreamChannelInfo, error) {
+func populateUpstreamChannels(status CableModemRawStatus) ([]UpstreamChannelInfo, error) {
 	var err error
 	usInfo := actionResp(status["GetCustomerStatusUpstreamChannelInfoResponse"])
 	squashedRows, err := parseString(usInfo, "CustomerConnUpstreamChannel", "Upstream Channel info")
@@ -373,7 +373,7 @@ func populateUpstreamChannels(status CableModemRawStatus) ([]CableModemUpstreamC
 
 	// Each row is delimited by a '|+|'
 	rows := strings.Split(squashedRows, "|+|")
-	result := make([]CableModemUpstreamChannelInfo, len(rows))
+	result := make([]UpstreamChannelInfo, len(rows))
 	for i, row := range rows {
 		// Each column is delimited by a '^'
 		cols := strings.Split(row, "^")
@@ -407,7 +407,7 @@ func populateUpstreamChannels(status CableModemRawStatus) ([]CableModemUpstreamC
 }
 
 // Populates cable modem log entries.
-func populateLogEntries(status CableModemRawStatus) ([]CableModemLogEntry, error) {
+func populateLogEntries(status CableModemRawStatus) ([]LogEntry, error) {
 	var err error
 	usInfo := actionResp(status["GetCustomerStatusLogResponse"])
 	squashedRows, err := parseString(usInfo, "CustomerStatusLogList", "Log list")
@@ -417,7 +417,7 @@ func populateLogEntries(status CableModemRawStatus) ([]CableModemLogEntry, error
 
 	// Each row is delimited by a '}-{'
 	rows := strings.Split(squashedRows, "}-{")
-	result := make([]CableModemLogEntry, len(rows))
+	result := make([]LogEntry, len(rows))
 	for i, row := range rows {
 		// Each column is delimited by a '^'
 		cols := strings.Split(row, "^")

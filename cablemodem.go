@@ -6,8 +6,8 @@ import "time"
 // CableModemRawStatus contains the raw status retrieved from the cable modem without any parsing.
 type CableModemRawStatus map[string]interface{}
 
-// CableModemDeviceInfo contains Cable Modem Device information.
-type CableModemDeviceInfo struct {
+// DeviceInfo contains Cable Modem Device information.
+type DeviceInfo struct {
 	// Cable Modem model.
 	Model string
 	// Cable Modem serial number.
@@ -16,8 +16,8 @@ type CableModemDeviceInfo struct {
 	MACAddress string
 }
 
-// CableModemDeviceSettings contains Cable Modem Device settings.
-type CableModemDeviceSettings struct {
+// DeviceSettings contains Cable Modem Device settings.
+type DeviceSettings struct {
 	// True if front panel LED lights are configured to be on, false otherwise.
 	FrontPanelLightsOn bool
 	// True if energy efficient ethernet setting is turned on, false otherwise.
@@ -28,8 +28,8 @@ type CableModemDeviceSettings struct {
 	NeverAsk bool
 }
 
-// CableModemAuthSettings contains Cable Modem Authentication settings.
-type CableModemAuthSettings struct {
+// AuthSettings contains Cable Modem Authentication settings.
+type AuthSettings struct {
 	// Hash of the current login.
 	CurrentLogin string
 	// Hash of the admin username.
@@ -42,8 +42,8 @@ type CableModemAuthSettings struct {
 	CurrentPasswordUser string
 }
 
-// CableModemSoftwareStatus contains Cable Modem Software status.
-type CableModemSoftwareStatus struct {
+// SoftwareStatus contains Cable Modem Software status.
+type SoftwareStatus struct {
 	// Firmware version.
 	FirmwareVersion string
 	// True if certificate has been installed, false otherwise.
@@ -56,8 +56,8 @@ type CableModemSoftwareStatus struct {
 	DOCSISSpecVersion string
 }
 
-// CableModemDownstreamChannelInfo contains Cable Modem Downstream channel information.
-type CableModemDownstreamChannelInfo struct {
+// DownstreamChannelInfo contains Cable Modem Downstream channel information.
+type DownstreamChannelInfo struct {
 	// Lock status.
 	LockStatus string
 	// Modulation.
@@ -76,8 +76,8 @@ type CableModemDownstreamChannelInfo struct {
 	UncorrectedErrors uint32
 }
 
-// CableModemUpstreamChannelInfo contains Cable Modem Upstream channel information.
-type CableModemUpstreamChannelInfo struct {
+// UpstreamChannelInfo contains Cable Modem Upstream channel information.
+type UpstreamChannelInfo struct {
 	// Lock status.
 	LockStatus string
 	// Modulation.
@@ -92,62 +92,62 @@ type CableModemUpstreamChannelInfo struct {
 	SignalPowerDBMV float32
 }
 
-// CableModemStartupBootStatus contains Cable Modem Startup Boot status.
-type CableModemStartupBootStatus struct {
+// StartupBootStatus contains Cable Modem Startup Boot status.
+type StartupBootStatus struct {
 	// Boot status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// CableModemStartupConfigurationFileStatus contains Cable Modem Startup Configuration file status.
-type CableModemStartupConfigurationFileStatus struct {
+// StartupConfigurationFileStatus contains Cable Modem Startup Configuration file status.
+type StartupConfigurationFileStatus struct {
 	// Configuration file status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// CableModemStartupConnectivityStatus contains Cable Modem Startup Connectivity status.
-type CableModemStartupConnectivityStatus struct {
+// StartupConnectivityStatus contains Cable Modem Startup Connectivity status.
+type StartupConnectivityStatus struct {
 	// Connectivity status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// CableModemStartupDownstreamConnectionStatus contains Cable Modem Startup Downstream Connection status.
-type CableModemStartupDownstreamConnectionStatus struct {
+// StartupDownstreamConnectionStatus contains Cable Modem Startup Downstream Connection status.
+type StartupDownstreamConnectionStatus struct {
 	// Frequency in Hz for the Downstream channel connection.
 	FrequencyHZ uint32
 	// Comments.
 	Comment string
 }
 
-// CableModemStartupSecurityStatus contains Cable Modem Startup Security status.
-type CableModemStartupSecurityStatus struct {
+// StartupSecurityStatus contains Cable Modem Startup Security status.
+type StartupSecurityStatus struct {
 	// Security status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// CableModemStartupStatus contains Cable Modem Startup Status.
-type CableModemStartupStatus struct {
+// StartupStatus contains Cable Modem Startup Status.
+type StartupStatus struct {
 	// Boot status.
-	Boot CableModemStartupBootStatus
+	Boot StartupBootStatus
 	// Configuration file status.
-	ConfigurationFile CableModemStartupConfigurationFileStatus
+	ConfigurationFile StartupConfigurationFileStatus
 	// Connectivity status.
-	Connectivity CableModemStartupConnectivityStatus
+	Connectivity StartupConnectivityStatus
 	// Downstream connection status.
-	DownstreamConnection CableModemStartupDownstreamConnectionStatus
+	DownstreamConnection StartupDownstreamConnectionStatus
 	// Security status.
-	Security CableModemStartupSecurityStatus
+	Security StartupSecurityStatus
 }
 
-// CableModemConnectionStatus contains Cable Modem Connection status.
-type CableModemConnectionStatus struct {
+// ConnectionStatus contains Cable Modem Connection status.
+type ConnectionStatus struct {
 	// Time at which connection was established (System Time - Up Time).
 	ConnectionEstablishedTime time.Time
 	// Current system time on the device.
@@ -169,33 +169,33 @@ type CableModemConnectionStatus struct {
 	// Primary upstream channel ID.
 	UpstreamChannelID uint8
 	// Downstream channel information.
-	DownstreamChannels []CableModemDownstreamChannelInfo
+	DownstreamChannels []DownstreamChannelInfo
 	// Upstream channel information.
-	UpstreamChannels []CableModemUpstreamChannelInfo
+	UpstreamChannels []UpstreamChannelInfo
 }
 
-// CableModemLogEntry contains Cable Modem Log entry.
-type CableModemLogEntry struct {
+// LogEntry contains Cable Modem Log entry.
+type LogEntry struct {
 	// Timestamp for this log entry.
 	Timestamp time.Time
 	// The log string in the entry.
 	Log string
 }
 
-// CableModemStatus contains Cable Modem Status.
+// CableModemStatus contains detailed status of the Cable Modem.
 type CableModemStatus struct {
 	// Device related information.
-	DeviceInfo CableModemDeviceInfo
+	DeviceInfo DeviceInfo
 	// General settings.
-	DeviceSettings CableModemDeviceSettings
+	DeviceSettings DeviceSettings
 	// Auth settings.
-	AuthSettings CableModemAuthSettings
+	AuthSettings AuthSettings
 	// Software status.
-	SoftwareStatus CableModemSoftwareStatus
+	SoftwareStatus SoftwareStatus
 	// Startup status.
-	StartupStatus CableModemStartupStatus
+	StartupStatus StartupStatus
 	// Connection status.
-	ConnectionStatus CableModemConnectionStatus
+	ConnectionStatus ConnectionStatus
 	// Logs.
-	Logs []CableModemLogEntry
+	Logs []LogEntry
 }
