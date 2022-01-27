@@ -271,7 +271,7 @@ func (r *Retriever) doAuth(challenge string, tok *token) error {
 
 	_, err := r.sendReq(loginAction, payload, tok)
 	if err != nil {
-		return fmt.Errorf("login failed.\nreason: %w", err)
+		return fmt.Errorf("auth failed.\nreason: %w", err)
 	}
 	return nil
 }
@@ -293,7 +293,7 @@ func (r *Retriever) login() (*token, error) {
 	}
 	err = r.doAuth(loginResp.challenge, tok)
 	if err != nil {
-		return nil, fmt.Errorf("login failed.\nreason: %w", err)
+		return nil, err
 	}
 	return tok, nil
 }
