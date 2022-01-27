@@ -171,11 +171,11 @@ func unpackResponse(action string, resp soapResponse) (actionResponse, error) {
 	return unpacked, nil
 }
 
-// Builds a new Retriever object to query the Cable Modem.
+// NewStatusRetriever returns a new retriever object that can be used to query the Cable Modem status.
 func NewStatusRetriever(input *RetrieverInput) *Retriever {
 	url := fmt.Sprintf(urlFormat, input.Protocol, input.Host)
 	r := Retriever{}
-	r.client = newHttpClient(url, input.SkipVerifyCert, input.Debug)
+	r.client = newHTTPClient(url, input.SkipVerifyCert, input.Debug)
 	r.username = input.Username
 	r.clearPassword = input.ClearPassword
 	r.debug = input.Debug
@@ -298,7 +298,7 @@ func (r *Retriever) login() (*token, error) {
 	return tok, nil
 }
 
-// Retrieves the current detailed raw status from the cable modem.
+// RawStatus retrieves the current detailed raw status from the cable modem.
 func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	var err error
 	loginAttempted := false
@@ -345,7 +345,7 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	return nil, err
 }
 
-// Retrieves and parses the current detailed status from the cable modem.
+// Status retrieves and parses the current detailed status from the cable modem.
 func (r *Retriever) Status() (*CableModemStatus, error) {
 	raw, err := r.RawStatus()
 	if err != nil {

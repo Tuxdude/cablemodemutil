@@ -8,7 +8,7 @@ import (
 
 type actionResponseBody map[string]interface{}
 
-// Parses the raw status returned by the cable modem into the structured cable modem status.
+// ParseRawStatus parses the raw status returned by the cable modem into the structured cable modem status.
 func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	err := validateSubResponses(status)
 	if err != nil {

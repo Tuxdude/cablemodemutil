@@ -58,7 +58,7 @@ type httpClient struct {
 	debug  *RetrieverDebug
 }
 
-func newHttpClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *httpClient {
+func newHTTPClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *httpClient {
 	c := httpClient{}
 	c.client = &http.Client{
 		Timeout: connectionTimeout * time.Second,

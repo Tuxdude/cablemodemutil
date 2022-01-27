@@ -153,26 +153,26 @@ func parseDurationStr(str string, desc string) (time.Duration, error) {
 	if len(components) > 1 {
 		d, err := strconv.ParseUint(components[0], 10, 32)
 		if err != nil {
-			return 0, fmt.Errorf("Unable to parse days in the specified %s timestamp %q, reason: %w", desc, str, err)
+			return 0, fmt.Errorf("unable to parse days in the specified %s timestamp %q, reason: %w", desc, str, err)
 		}
 		days = time.Duration(d)
 		nextIndex = 1
 	}
 	hoursMinsSecs := strings.Split(components[nextIndex], ":")
 	if len(hoursMinsSecs) != 3 {
-		return 0, fmt.Errorf("Unable to split hours:mins:secs in the specified %s timestamp %q", desc, str)
+		return 0, fmt.Errorf("unable to split hours:mins:secs in the specified %s timestamp %q", desc, str)
 	}
 	hours, err := parseTimeElementWithSuffix(hoursMinsSecs[0], "h")
 	if err != nil {
-		return 0, fmt.Errorf("Unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
+		return 0, fmt.Errorf("unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
 	}
 	mins, err := parseTimeElementWithSuffix(hoursMinsSecs[1], "m")
 	if err != nil {
-		return 0, fmt.Errorf("Unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
+		return 0, fmt.Errorf("unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
 	}
 	secs, err := parseTimeElementWithSuffix(hoursMinsSecs[2], "s")
 	if err != nil {
-		return 0, fmt.Errorf("Unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
+		return 0, fmt.Errorf("unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
 	}
 	return (time.Duration(days) * 24 * time.Hour) + (time.Duration(hours) * time.Hour) + (time.Duration(mins) * time.Minute) + (time.Duration(secs) * time.Second), nil
 }
@@ -181,12 +181,12 @@ func parseDurationStr(str string, desc string) (time.Duration, error) {
 func parseTimeElementWithSuffix(str string, suffix string) (uint32, error) {
 	components := strings.Split(str, suffix)
 	if len(components) != 2 {
-		return 0, fmt.Errorf("Unable to parse string %q (split: %d), expected to have suffix %q but did not", str, len(components), suffix)
+		return 0, fmt.Errorf("unable to parse string %q (split: %d), expected to have suffix %q but did not", str, len(components), suffix)
 	}
 
 	num, err := strconv.ParseUint(components[0], 10, 32)
 	if err != nil {
-		return 0, fmt.Errorf("Unable to parse component %q as a uint", num)
+		return 0, fmt.Errorf("unable to parse component %q as a uint", num)
 	}
 	return uint32(num), nil
 }

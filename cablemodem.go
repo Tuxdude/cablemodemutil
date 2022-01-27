@@ -1,3 +1,4 @@
+// Package cablemodemutil exposes functions to connect and retrieve the status from a cable modem.
 package cablemodemutil
 
 import "time"
