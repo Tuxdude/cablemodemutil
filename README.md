@@ -7,4 +7,4 @@ Modem. If you would like to add support for other cable modems, please
 file an Issue or submit a pull request with details for further discussion.
 
 If you're looking for a command-line interface to use this library, please
-see https://github.com/Tuxdude/cablemodemcli.
+see [`cablemodemcli`](https://github.com/Tuxdude/cablemodemcli).
