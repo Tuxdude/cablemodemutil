@@ -260,7 +260,11 @@ func (r *Retriever) getLoginResponse() (*loginResponse, error) {
 
 // Performs authentication with the cable modem and returns the response.
 func (r *Retriever) doAuth(challenge string, tok *token) error {
-	hashedPassword := genHashedPassword(tok.privateKey, challenge, r.clearPassword)
+	hashedPassword, err := genHashedPassword(tok.privateKey, challenge, r.clearPassword)
+	if err != nil {
+		return fmt.Errorf("auth failed while generating hashed password, reason: %w", err)
+	}
+
 	payload := actionRequest{
 		"LoginPassword": hashedPassword,
 		"Captcha":       "",
@@ -268,8 +272,7 @@ func (r *Retriever) doAuth(challenge string, tok *token) error {
 		"Action":        "login",
 		"Username":      r.username,
 	}
-
-	_, err := r.sendReq(loginAction, payload, tok)
+	_, err = r.sendReq(loginAction, payload, tok)
 	if err != nil {
 		return fmt.Errorf("auth failed.\nreason: %w", err)
 	}
@@ -285,7 +288,11 @@ func (r *Retriever) login() (*token, error) {
 	// Compute the expiry time as soon as we obtain the response.
 	expiry := time.Now().Add(tokenExpiryDuration)
 
-	privateKey := genPrivateKey(loginResp.publicKey, loginResp.challenge, r.clearPassword)
+	privateKey, err := genPrivateKey(loginResp.publicKey, loginResp.challenge, r.clearPassword)
+	if err != nil {
+		return nil, fmt.Errorf("login failed while generating private key, reason: %w", err)
+	}
+
 	tok := &token{
 		uid:        loginResp.uid,
 		privateKey: privateKey,

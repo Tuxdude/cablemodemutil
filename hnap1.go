@@ -25,19 +25,22 @@ func actionResultKey(action string) string {
 }
 
 // Generates the private key using the public key, challenge and the clear password.
-func genPrivateKey(publicKey string, challenge string, clearPassword string) string {
+func genPrivateKey(publicKey string, challenge string, clearPassword string) (string, error) {
 	return genHMACMD5(publicKey+clearPassword, challenge)
 }
 
 // Generates the hashed password using the private key, challenge and the clear password.
-func genHashedPassword(privateKey string, challenge string, clearPassword string) string {
+func genHashedPassword(privateKey string, challenge string, clearPassword string) (string, error) {
 	return genHMACMD5(privateKey, challenge)
 }
 
 // Generates the HNAP auth for the request.
-func genHNAPAuth(privateKey string, soapAction string) string {
+func genHNAPAuth(privateKey string, soapAction string) (string, error) {
 	currTime := time.Now().UnixMilli()
 	authMsg := fmt.Sprintf("%d%s", currTime, actionURI(soapAction))
-	auth := genHMACMD5(privateKey, authMsg)
-	return fmt.Sprintf("%s %d", auth, currTime)
+	auth, err := genHMACMD5(privateKey, authMsg)
+	if err != nil {
+		return "", fmt.Errorf("HNAP auth generation failed, reason: %w", err)
+	}
+	return fmt.Sprintf("%s %d", auth, currTime), nil
 }

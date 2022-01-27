@@ -42,14 +42,20 @@ func genCookies(tok *token) []*http.Cookie {
 }
 
 // Adds the necessary headers and cookies to the HTTP request for the specified SOAP action.
-func addHeadersAndCookies(req *http.Request, action string, tok *token) {
+func addHeadersAndCookies(req *http.Request, action string, tok *token) error {
+	auth, err := genHNAPAuth(tok.privateKey, action)
+	if err != nil {
+		return err
+	}
+
 	req.Header.Add(contentTypeHeader, contentTypeHeaderValue)
 	req.Header.Add(actionHeader, actionURI(action))
-	req.Header.Add(hnapAuthHeader, genHNAPAuth(tok.privateKey, action))
+	req.Header.Add(hnapAuthHeader, auth)
 	c := genCookies(tok)
 	for _, cookie := range c {
 		req.AddCookie(cookie)
 	}
+	return nil
 }
 
 type httpClient struct {
@@ -83,7 +89,10 @@ func (c *httpClient) sendPOST(action string, payload *bytes.Buffer, tok *token) 
 	// See https://stackoverflow.com/questions/17714494/golang-http-request-results-in-eof-errors-when-making-multiple-requests-successi
 	req.Close = true
 
-	addHeadersAndCookies(req, action, tok)
+	err = addHeadersAndCookies(req, action, tok)
+	if err != nil {
+		return nil, err
+	}
 
 	if c.debug.Debug {
 		fmt.Printf("Dumping token before the request: %s\n", action)
