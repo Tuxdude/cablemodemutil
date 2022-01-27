@@ -11,7 +11,8 @@ import (
 
 // Logs token debug information.
 func debugToken(tok *token) {
-	fmt.Printf("Current Time: %q\nToken: {expiry:%q uid:%q privateKey:%q}\n\n\n", time.Now(), tok.expiry, tok.uid, tok.privateKey)
+	fmt.Printf("Current Time: %q\n", time.Now())
+	fmt.Printf("Token: {expiry:%q uid:%q privateKey:%q}\n\n\n", tok.expiry, tok.uid, tok.privateKey)
 }
 
 // Dumps the HTTP request for the purpose of debugging.
