@@ -249,15 +249,6 @@ func parseSignalPowerInt(data actionResponseBody, key string, hasDBMVSuffix bool
 	return parseSignalPowerIntStr(s, hasDBMVSuffix, desc)
 }
 
-// Parses the value of the specified key as a signal power floating point value in the specified status information.
-func parseSignalPowerFloat(data actionResponseBody, key string, hasDBMVSuffix bool, desc string) (float32, error) {
-	s, err := parseString(data, key, desc)
-	if err != nil {
-		return 0, err
-	}
-	return parseSignalPowerFloatStr(s, hasDBMVSuffix, desc)
-}
-
 // Parses the value of the specified key as a signal SNR integer value in the specified status information.
 func parseSignalSNR(data actionResponseBody, key string, hasDBSuffix bool, desc string) (int32, error) {
 	s, err := parseString(data, key, desc)
@@ -265,15 +256,6 @@ func parseSignalSNR(data actionResponseBody, key string, hasDBSuffix bool, desc 
 		return 0, err
 	}
 	return parseSignalSNRStr(s, hasDBSuffix, desc)
-}
-
-// Parses the value of the specified key as a signal errors integer value in the specified status information.
-func parseSignalErrors(data actionResponseBody, key string, desc string) (uint32, error) {
-	s, err := parseString(data, key, desc)
-	if err != nil {
-		return 0, err
-	}
-	return parseSignalErrorsStr(s, desc)
 }
 
 // Parses the value of the specified key as a channel ID integer value in the specified status information.
