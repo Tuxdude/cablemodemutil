@@ -124,13 +124,16 @@ func resetToken() *token {
 }
 
 // Encodes the specified payload for the specified action into a byte buffer to send this as a request.
-func encodePayload(action string, payload actionRequest) *bytes.Buffer {
+func encodePayload(action string, payload actionRequest) (*bytes.Buffer, error) {
 	req := soapRequest{
 		action: payload,
 	}
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(req)
-	return buf
+	err := json.NewEncoder(buf).Encode(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode request as JSON, reason: %w", err)
+	}
+	return buf, nil
 }
 
 // Decodes the specified byte array response for the specified action into the response payload.
@@ -212,7 +215,10 @@ func (r *Retriever) getToken() *token {
 
 // Sends the SOAP request for the specified action containing the specified payload.
 func (r *Retriever) sendReq(action string, payload actionRequest, tok *token) (actionResponse, error) {
-	req := encodePayload(action, payload)
+	req, err := encodePayload(action, payload)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := r.client.sendPOST(action, req, tok)
 	if err != nil {
 		return nil, err
