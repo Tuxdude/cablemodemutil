@@ -39,5 +39,19 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Run Tests
+      - name: Run Tests (Linux/ OSX)
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: go test -v -race -coverprofile coverage.out -covermode atomic ./...
+
+      - name: Run Tests (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
         run: go test -v ./...
+
+      - name: Upload coverage to Codecov (Linux / OSX)
+        uses: codecov/codecov-action@v2
+        if: ${{ matrix.os != 'windows-latest' }}
+        with:
+          files: coverage.out
+          fail_ci_if_error: true
+          flags: unittests
+          verbose: true
