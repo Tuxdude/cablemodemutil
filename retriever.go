@@ -321,7 +321,7 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	}
 
 	tok := r.getToken()
-	for true {
+	for {
 		// If the token has expired, login to generate a fresh token.
 		if time.Now().After(tok.expiry) {
 			if r.debug.Debug {
