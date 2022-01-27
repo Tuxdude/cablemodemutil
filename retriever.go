@@ -53,7 +53,7 @@ type Retriever struct {
 	client        *httpClient
 	username      string
 	clearPassword string
-	debug         *RetrieverDebug
+	debug         RetrieverDebug
 	tok           *token
 	tokMu         sync.Mutex
 }
@@ -71,7 +71,7 @@ type RetrieverInput struct {
 	// Password for authenticating with the cable modem.
 	ClearPassword string
 	// Debugging options.
-	Debug *RetrieverDebug
+	Debug RetrieverDebug
 }
 
 // RetrieverDebug is used to specify the debugging options of the Retriever.
@@ -175,7 +175,7 @@ func unpackResponse(action string, resp soapResponse) (actionResponse, error) {
 func NewStatusRetriever(input *RetrieverInput) *Retriever {
 	url := fmt.Sprintf(urlFormat, input.Protocol, input.Host)
 	r := Retriever{}
-	r.client = newHTTPClient(url, input.SkipVerifyCert, input.Debug)
+	r.client = newHTTPClient(url, input.SkipVerifyCert, &input.Debug)
 	r.username = input.Username
 	r.clearPassword = input.ClearPassword
 	r.debug = input.Debug

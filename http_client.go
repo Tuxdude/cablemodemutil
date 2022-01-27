@@ -55,7 +55,7 @@ func addHeadersAndCookies(req *http.Request, action string, tok *token) {
 type httpClient struct {
 	client *http.Client
 	url    string
-	debug  *RetrieverDebug
+	debug  RetrieverDebug
 }
 
 func newHTTPClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *httpClient {
@@ -69,7 +69,7 @@ func newHTTPClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *http
 		}
 	}
 	c.url = url
-	c.debug = debug
+	c.debug = *debug
 	return &c
 }
 
