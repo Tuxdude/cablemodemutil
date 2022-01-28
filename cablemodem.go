@@ -92,40 +92,40 @@ type UpstreamChannelInfo struct {
 	SignalPowerDBMV float32
 }
 
-// StartupBootStatus contains Cable Modem Startup Boot status.
-type StartupBootStatus struct {
+// BootStatus contains Cable Modem Startup Boot status.
+type BootStatus struct {
 	// Boot status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// StartupConfigurationFileStatus contains Cable Modem Startup Configuration file status.
-type StartupConfigurationFileStatus struct {
+// ConfigFileStatus contains Cable Modem Startup Configuration file status.
+type ConfigFileStatus struct {
 	// Configuration file status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// StartupConnectivityStatus contains Cable Modem Startup Connectivity status.
-type StartupConnectivityStatus struct {
+// ConnectivityStatus contains Cable Modem Startup Connectivity status.
+type ConnectivityStatus struct {
 	// Connectivity status.
 	Status string
 	// Comments.
 	Comment string
 }
 
-// StartupDownstreamConnectionStatus contains Cable Modem Startup Downstream Connection status.
-type StartupDownstreamConnectionStatus struct {
+// DownstreamStatus contains Cable Modem Startup Downstream Connection status.
+type DownstreamStatus struct {
 	// Frequency in Hz for the Downstream channel connection.
 	FrequencyHZ uint32
 	// Comments.
 	Comment string
 }
 
-// StartupSecurityStatus contains Cable Modem Startup Security status.
-type StartupSecurityStatus struct {
+// SecurityStatus contains Cable Modem Startup Security status.
+type SecurityStatus struct {
 	// Security status.
 	Status string
 	// Comments.
@@ -135,21 +135,21 @@ type StartupSecurityStatus struct {
 // StartupStatus contains Cable Modem Startup Status.
 type StartupStatus struct {
 	// Boot status.
-	Boot StartupBootStatus
+	Boot BootStatus
 	// Configuration file status.
-	ConfigurationFile StartupConfigurationFileStatus
+	ConfigFile ConfigFileStatus
 	// Connectivity status.
-	Connectivity StartupConnectivityStatus
+	Connectivity ConnectivityStatus
 	// Downstream connection status.
-	DownstreamConnection StartupDownstreamConnectionStatus
+	Downstream DownstreamStatus
 	// Security status.
-	Security StartupSecurityStatus
+	Security SecurityStatus
 }
 
 // ConnectionStatus contains Cable Modem Connection status.
 type ConnectionStatus struct {
 	// Time at which connection was established (System Time - Up Time).
-	ConnectionEstablishedTime time.Time
+	EstablishedAt time.Time
 	// Current system time on the device.
 	SystemTime time.Time
 	// Duration for which the connection has been up.
@@ -185,17 +185,17 @@ type LogEntry struct {
 // CableModemStatus contains detailed status of the Cable Modem.
 type CableModemStatus struct {
 	// Device related information.
-	DeviceInfo DeviceInfo
+	Info DeviceInfo
 	// General settings.
-	DeviceSettings DeviceSettings
+	Settings DeviceSettings
 	// Auth settings.
-	AuthSettings AuthSettings
+	Auth AuthSettings
 	// Software status.
-	SoftwareStatus SoftwareStatus
+	Software SoftwareStatus
 	// Startup status.
-	StartupStatus StartupStatus
+	Startup StartupStatus
 	// Connection status.
-	ConnectionStatus ConnectionStatus
+	Connection ConnectionStatus
 	// Logs.
 	Logs []LogEntry
 }

@@ -16,27 +16,27 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 	}
 
 	result := CableModemStatus{}
-	err = populateDeviceInfo(status, &result.DeviceInfo)
+	err = populateDeviceInfo(status, &result.Info)
 	if err != nil {
 		return nil, err
 	}
-	err = populateDeviceSettings(status, &result.DeviceSettings)
+	err = populateDeviceSettings(status, &result.Settings)
 	if err != nil {
 		return nil, err
 	}
-	err = populateAuthSettings(status, &result.AuthSettings)
+	err = populateAuthSettings(status, &result.Auth)
 	if err != nil {
 		return nil, err
 	}
-	err = populateSoftwareStatus(status, &result.SoftwareStatus)
+	err = populateSoftwareStatus(status, &result.Software)
 	if err != nil {
 		return nil, err
 	}
-	err = populateStartupStatus(status, &result.StartupStatus)
+	err = populateStartupStatus(status, &result.Startup)
 	if err != nil {
 		return nil, err
 	}
-	err = populateConnectionStatus(status, &result.ConnectionStatus)
+	err = populateConnectionStatus(status, &result.Connection)
 	if err != nil {
 		return nil, err
 	}
@@ -214,11 +214,11 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 	if err != nil {
 		return err
 	}
-	result.ConfigurationFile.Status, err = parseString(startup, "CustomerConnConfigurationFileStatus", "Configuration File Status")
+	result.ConfigFile.Status, err = parseString(startup, "CustomerConnConfigurationFileStatus", "Configuration File Status")
 	if err != nil {
 		return err
 	}
-	result.ConfigurationFile.Comment, err = parseString(startup, "CustomerConnConfigurationFileComment", "Configuration File Comment")
+	result.ConfigFile.Comment, err = parseString(startup, "CustomerConnConfigurationFileComment", "Configuration File Comment")
 	if err != nil {
 		return err
 	}
@@ -230,11 +230,11 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 	if err != nil {
 		return err
 	}
-	result.DownstreamConnection.FrequencyHZ, err = parseFreq(startup, "CustomerConnDSFreq", true, "Downstream Connection Frequency")
+	result.Downstream.FrequencyHZ, err = parseFreq(startup, "CustomerConnDSFreq", true, "Downstream Connection Frequency")
 	if err != nil {
 		return err
 	}
-	result.DownstreamConnection.Comment, err = parseString(startup, "CustomerConnDSComment", "Downstream Connection Comment")
+	result.Downstream.Comment, err = parseString(startup, "CustomerConnDSComment", "Downstream Connection Comment")
 	if err != nil {
 		return err
 	}
@@ -264,7 +264,7 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.ConnectionEstablishedTime = result.SystemTime.Add(-result.UpTime)
+	result.EstablishedAt = result.SystemTime.Add(-result.UpTime)
 	result.DOCSISNetworkAccess, err = parseString(conn, "CustomerConnNetworkAccess", "DOCSIS Network Access")
 	if err != nil {
 		return err

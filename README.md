@@ -50,13 +50,13 @@ func main() {
   // Access the status information.
   // More detailed fields are available in the status, please
   // refer to the documentation.
-  fmt.Printf("Model: %s\n", st.DeviceInfo.Model)
-  fmt.Printf("Serial Number: %s\n", st.DeviceInfo.SerialNumber)
-  fmt.Printf("MAC Address: %s\n", st.DeviceInfo.MACAddress)
-  fmt.Printf("Connection Established Timestamp: %s\n", st.ConnectionStatus.ConnectionEstablishedTime)
-  fmt.Printf("Firmaware version: %s\n", st.SoftwareStatus.FirmwareVersion)
-  fmt.Printf("DOCSIS Version: %s\n", st.SoftwareStatus.DOCSISSpecVersion)
-  fmt.Printf("Downstream Channel: %d Hz\n", st.StartupStatus.DownstreamConnection.FrequencyHZ)
+  fmt.Printf("Model: %s\n", st.Info.Model)
+  fmt.Printf("Serial Number: %s\n", st.Info.SerialNumber)
+  fmt.Printf("MAC Address: %s\n", st.Info.MACAddress)
+  fmt.Printf("Connection Established Timestamp: %s\n", st.Connection.EstablishedAt)
+  fmt.Printf("Firmaware version: %s\n", st.Software.FirmwareVersion)
+  fmt.Printf("DOCSIS Version: %s\n", st.Software.DOCSISSpecVersion)
+  fmt.Printf("Downstream Channel: %d Hz\n", st.Startup.Downstream.FrequencyHZ)
 
   os.Exit(0)
 }
