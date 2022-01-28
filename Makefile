@@ -46,6 +46,7 @@ GOLANGCILINT   := $(GO_CI_LINT_CMD) run
 GOVET          := $(GO_CMD) vet
 GOBUILD        := $(GO_CMD) build
 GOTEST         := $(GO_CMD) test -v
+GOCOVERAGE     := $(GO_CMD) test -v -race -coverprofile coverage.out -covermode atomic
 
 # Alternative for running golangci-lint, using docker instead:
 # docker run \
@@ -98,5 +99,8 @@ build: tidy
 
 test: tidy
 	$(call ExecWithMsg,Testing,$(GOTEST) ./...)
+
+coverage: tidy
+	$(call ExecWithMsg,Testing with Coverage generation,$(GOCOVERAGE) ./...)
 
 .PHONY: all clean tidy fiximports fmt lint lintagg vet build test
