@@ -36,17 +36,19 @@ GO_LINT_CMD    := golint
 GO_CI_LINT_CMD := golangci-lint
 
 # Commands invoked from rules.
+GOBUILD        := $(GO_CMD) build
 GOCLEAN        := $(GO_CMD) clean
+GOGET          := $(GO_CMD) get -u
+GOLIST         := $(GO_CMD) list
 GOMOD          := $(GO_CMD) mod
+GOTEST         := $(GO_CMD) test -v
+GOCOVERAGE     := $(GO_CMD) test -v -race -coverprofile coverage.out -covermode atomic
+GOVET          := $(GO_CMD) vet
 GOIMPORTS      := $(GO_IMPORTS_CMD) -w
 GOFMT          := $(GO_FMT_CMD) -s -w
 GOLINT         := $(GO_LINT_CMD) -set_exit_status -min_confidence 0.200001
 GOLINTAGG      := $(GO_LINT_CMD) -set_exit_status -min_confidence 0
 GOLANGCILINT   := $(GO_CI_LINT_CMD) run
-GOVET          := $(GO_CMD) vet
-GOBUILD        := $(GO_CMD) build
-GOTEST         := $(GO_CMD) test -v
-GOCOVERAGE     := $(GO_CMD) test -v -race -coverprofile coverage.out -covermode atomic
 
 # Alternative for running golangci-lint, using docker instead:
 # docker run \
@@ -71,6 +73,14 @@ PKGS ?= $(shell $(GO_CMD) list ./... | grep -v /vendor/)
 # Define tags.
 TAGS ?=
 
+DEP_PKGS := $(shell $(GO_CMD) list -f '{{ join .Imports "\n" }}' | grep tuxdude || true)
+ifeq ($(DEP_PKGS),)
+    DEP_PKGS_TEXT := None
+else
+    DEP_PKGS_TEXT := $(DEP_PKGS)
+    DEP_PKGS := $(addsuffix @master,$(DEP_PKGS))
+endif
+
 all: fiximports fmt lint vet build test
 
 clean:
@@ -94,6 +104,9 @@ vet:
 tidy:
 	$(call ExecWithMsg,Tidying module,$(GOMOD) tidy)
 
+deps_update:
+	$(call ExecWithMsg,Updating to the latest version of dependencies for \"$(DEP_PKGS_TEXT)\",$(GOGET) $(DEP_PKGS))
+
 build: tidy
 	$(call ExecWithMsg,Building,$(GOBUILD) ./...)
 
@@ -103,4 +116,4 @@ test: tidy
 coverage: tidy
 	$(call ExecWithMsg,Testing with Coverage generation,$(GOCOVERAGE) ./...)
 
-.PHONY: all clean tidy fiximports fmt lint lintagg vet build test
+.PHONY: all clean fiximports fmt lint lintagg vet tidy deps_update build test
