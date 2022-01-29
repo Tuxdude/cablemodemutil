@@ -13,7 +13,7 @@ see [`cablemodemcli`](https://github.com/Tuxdude/cablemodemcli).
 
 # Example usage
 
-```
+```go
 package main
 
 import (
