@@ -2,7 +2,7 @@ package cablemodemutil
 
 import (
 	"crypto/hmac"
-	"crypto/md5"
+	"crypto/md5" // nolint:gosec
 	"fmt"
 	"io"
 )
