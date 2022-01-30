@@ -15,38 +15,37 @@ const (
 	queryAction         = "GetMultipleHNAPs"
 )
 
-var (
-	statusSubCommands = []string{
-		// MAC address, serial number and model info.
-		"GetArrisRegisterInfo",
-		// Software version info along with device MAC addr / serial.
-		"GetCustomerStatusSoftware",
-		// Short Device Status and signal info.
-		"GetArrisDeviceStatus",
-		// Current Time, uptime and short connection status.
-		"GetCustomerStatusConnectionInfo",
-		// Detailed connection status.
-		"GetCustomerStatusStartupSequence",
-		// Downstream channel info.
-		"GetCustomerStatusDownstreamChannelInfo",
-		// Upstream channel info.
-		"GetCustomerStatusUpstreamChannelInfo",
-		// Downstream/Upstream Frequency summary and configurable settings.
-		"GetArrisConfigurationInfo",
-		// Event log.
-		"GetCustomerStatusLog",
-		// User login/password information (Not so useful).
-		"GetCustomerStatusSecAccount",
-		// Ask me later and never ask (Not so useful).
-		"GetArrisRegisterStatus",
-		// Just contains 'XXX' (Not useful).
-		"GetCustomerStatusXXX",
-		// Just contains 'XXX' (Not useful).
-		"GetArrisXXX",
-		// Just contains 'XXX' (Not useful).
-		"GetCustomerStatusLogXXX",
-	}
-)
+// nolint:gochecknoglobals
+var statusSubCommands = []string{
+	// MAC address, serial number and model info.
+	"GetArrisRegisterInfo",
+	// Software version info along with device MAC addr / serial.
+	"GetCustomerStatusSoftware",
+	// Short Device Status and signal info.
+	"GetArrisDeviceStatus",
+	// Current Time, uptime and short connection status.
+	"GetCustomerStatusConnectionInfo",
+	// Detailed connection status.
+	"GetCustomerStatusStartupSequence",
+	// Downstream channel info.
+	"GetCustomerStatusDownstreamChannelInfo",
+	// Upstream channel info.
+	"GetCustomerStatusUpstreamChannelInfo",
+	// Downstream/Upstream Frequency summary and configurable settings.
+	"GetArrisConfigurationInfo",
+	// Event log.
+	"GetCustomerStatusLog",
+	// User login/password information (Not so useful).
+	"GetCustomerStatusSecAccount",
+	// Ask me later and never ask (Not so useful).
+	"GetArrisRegisterStatus",
+	// Just contains 'XXX' (Not useful).
+	"GetCustomerStatusXXX",
+	// Just contains 'XXX' (Not useful).
+	"GetArrisXXX",
+	// Just contains 'XXX' (Not useful).
+	"GetCustomerStatusLogXXX",
+}
 
 // Retriever is used to retrieve the current status of the Cable Modem.
 type Retriever struct {
