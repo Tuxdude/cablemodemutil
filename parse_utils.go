@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	// DD/MM/YYYY HH:MM:SS
+	// Log timestamps are in the format "DD/MM/YYYY HH:MM:SS".
 	eventLogTimestampFormat = "2/1/2006 15:04:05"
-	// DAY MON DATE HH:MM:SS YYYY
+	// System timestamps are in the format "DAY MON DATE HH:MM:SS YYYY".
 	systemTimestampFormat = "Mon Jan 2 15:04:05 2006"
 )
 
