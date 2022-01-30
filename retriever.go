@@ -153,15 +153,15 @@ func unpackResponse(action string, resp soapResponse) (actionResponse, error) {
 	}
 
 	respKey := actionResponseKey(action)
-	unpacked, ok := resp[respKey]
-	if !ok {
+	unpacked, keyExists := resp[respKey]
+	if !keyExists {
 		return nil, fmt.Errorf(
 			"action: %s, unable to find the response key %q in response.\nresponse: %v", action, respKey, prettyPrintJSON(resp))
 	}
 
 	resultKey := actionResultKey(action)
-	result, ok := unpacked[resultKey]
-	if !ok {
+	result, keyExists := unpacked[resultKey]
+	if !keyExists {
 		return nil, fmt.Errorf(
 			"action: %s, unable to find the result key %q in unpacked response.\nunpacked response: %v", action, resultKey, prettyPrintJSON(unpacked))
 	}
@@ -240,24 +240,19 @@ func (r *Retriever) getLoginResponse() (*loginResponse, error) {
 		return nil, fmt.Errorf("failed to retrieve login challenge\nreason: %w", err)
 	}
 
-	var ok bool
+	respBody := actionResponseBody(resp)
 	result := loginResponse{}
-	result.uid, ok = resp["Cookie"].(string)
-	if !ok {
-		return nil, fmt.Errorf(
-			"unable to find key 'Cookie' in login response\nresponse: %v", prettyPrintJSON(resp))
+	result.uid, err = parseString(respBody, "Cookie", "Cookie in login response")
+	if err != nil {
+		return nil, err
 	}
-
-	result.publicKey, ok = resp["PublicKey"].(string)
-	if !ok {
-		return nil, fmt.Errorf(
-			"unable to find key 'PublicKey' in login response\nresponse: %v", prettyPrintJSON(resp))
+	result.publicKey, err = parseString(respBody, "PublicKey", "Public key in login response")
+	if err != nil {
+		return nil, err
 	}
-
-	result.challenge, ok = resp["Challenge"].(string)
-	if !ok {
-		return nil, fmt.Errorf(
-			"unable to find key 'Challenge' in login response\nresponse: %v", prettyPrintJSON(resp))
+	result.challenge, err = parseString(respBody, "Challenge", "Challenge in login response")
+	if err != nil {
+		return nil, err
 	}
 
 	return &result, nil
@@ -335,15 +330,15 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 			r.persistToken(tok)
 		}
 
-		var st actionResponse
+		var status actionResponse
 		// Compute the new token expiry time based on when we send the request.
 		newExpiry := time.Now().Add(tokenExpiryDuration)
 		// Fetch the current status.
-		st, err = r.sendReq(queryAction, payload, tok)
+		status, err = r.sendReq(queryAction, payload, tok)
 		if err == nil {
 			tok.expiry = newExpiry
 			r.persistToken(tok)
-			return CableModemRawStatus(st), nil
+			return CableModemRawStatus(status), nil
 		}
 
 		// If there is a failure in fetching the current status, and we
