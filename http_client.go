@@ -69,10 +69,8 @@ func newHTTPClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *http
 	c.client = &http.Client{
 		Timeout: connectionTimeout * time.Second,
 	}
-	if skipVerifyCert {
-		c.client.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
+	c.client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerifyCert}, // nolint:gosec
 	}
 	c.url = url
 	c.debug = *debug
