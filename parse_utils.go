@@ -63,7 +63,7 @@ func parseInt32(str string, hasSuffix bool, suffix string, desc string) (int32, 
 }
 
 // Parses the specified string as a float64 after stripping the suffix if required.
-func parseFloat64(str string, hasSuffix bool, suffix string, desc string) (float64, error) {
+func parseFloat32(str string, hasSuffix bool, suffix string, desc string) (float32, error) {
 	if hasSuffix {
 		if !strings.HasSuffix(str, suffix) {
 			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
@@ -71,65 +71,41 @@ func parseFloat64(str string, hasSuffix bool, suffix string, desc string) (float
 		str = strings.TrimSuffix(str, suffix)
 	}
 
-	res, err := strconv.ParseFloat(str, 64)
+	res, err := strconv.ParseFloat(str, 32)
 	if err != nil {
 		return 0, fmt.Errorf("unable to convert %q to float64: %w", str, err)
 	}
-	return res, nil
+	return float32(res), nil
 }
 
 // Parses the specified string as a channel frequency after stripping the ' Hz' suffix if required.
 func parseFreqStr(str string, hasHzSuffix bool, desc string) (uint32, error) {
-	f, err := parseUint32(str, hasHzSuffix, " Hz", desc)
-	if err != nil {
-		return 0, err
-	}
-	return uint32(f), nil
+	return parseUint32(str, hasHzSuffix, " Hz", desc)
 }
 
 // Parses the specified string as a signal power integer value after stripping the ' dBmV' suffix if required.
 func parseSignalPowerIntStr(str string, hasDBMVSuffix bool, desc string) (int32, error) {
-	pow, err := parseInt32(str, hasDBMVSuffix, " dBmV", desc)
-	if err != nil {
-		return 0, err
-	}
-	return int32(pow), nil
+	return parseInt32(str, hasDBMVSuffix, " dBmV", desc)
 }
 
 // Parses the specified string as a signal power floating point value after stripping the ' dBmV' suffix if required.
 func parseSignalPowerFloatStr(str string, hasDBMVSuffix bool, desc string) (float32, error) {
-	pow, err := parseFloat64(str, hasDBMVSuffix, " dBmV", desc)
-	if err != nil {
-		return 0, err
-	}
-	return float32(pow), nil
+	return parseFloat32(str, hasDBMVSuffix, " dBmV", desc)
 }
 
 // Parses the specified string as a signal SNR integer value after stripping the ' dB' suffix if required.
 func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (int32, error) {
-	snr, err := parseInt32(str, hasDBSuffix, " dB", desc)
-	if err != nil {
-		return 0, err
-	}
-	return int32(snr), nil
+	return parseInt32(str, hasDBSuffix, " dB", desc)
 }
 
 // Parses the specified string as a signal errors integer value.
 func parseSignalErrorsStr(str string, desc string) (uint32, error) {
-	count, err := parseUint32(str, false, "", desc)
-	if err != nil {
-		return 0, err
-	}
-	return uint32(count), nil
+	return parseUint32(str, false, "", desc)
 }
 
 // Parses the specified string as a channel ID value.
 func parseChannelIDStr(str string, desc string) (uint8, error) {
-	id, err := parseUint8(str, false, "", desc)
-	if err != nil {
-		return 0, err
-	}
-	return uint8(id), nil
+	return parseUint8(str, false, "", desc)
 }
 
 // Parses the log timestamp from the specified date and time string values.
