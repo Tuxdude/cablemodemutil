@@ -1,7 +1,6 @@
 package cablemodemutil
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -78,7 +77,7 @@ func newHTTPClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *http
 }
 
 // Sends the HTTP POST request for the specified SOAP action containing the specified payload.
-func (c *httpClient) sendPOST(action string, payload *bytes.Buffer, tok *token) (*[]byte, error) {
+func (c *httpClient) sendPOST(action string, payload io.Reader, tok *token) (*[]byte, error) {
 	req, err := http.NewRequest("POST", c.url, payload)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create POST request, reason: %w", err)
