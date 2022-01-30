@@ -77,12 +77,14 @@ func newHTTPClient(url string, skipVerifyCert bool, debug *RetrieverDebug) *http
 }
 
 // Sends the HTTP POST request for the specified SOAP action containing the specified payload.
+// nolint:funlen
 func (c *httpClient) sendPOST(action string, payload io.Reader, tok *token) (*[]byte, error) {
 	req, err := http.NewRequest("POST", c.url, payload)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create POST request, reason: %w", err)
 	}
 	// Needed to avoid EOF errors.
+	// nolint:lll
 	// See https://stackoverflow.com/questions/17714494/golang-http-request-results-in-eof-errors-when-making-multiple-requests-successi
 	req.Close = true
 
@@ -101,7 +103,13 @@ func (c *httpClient) sendPOST(action string, payload io.Reader, tok *token) (*[]
 	}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed.\nresp: %s\nreason: %w", action, prettyPrintJSON(resp), err)
+		return nil, fmt.Errorf(
+			"HTTP POST request for SOAP action %q failed.\n"+
+				"resp: %s\nreason: %w",
+			action,
+			prettyPrintJSON(resp),
+			err,
+		)
 	}
 	defer resp.Body.Close()
 	if c.debug.DebugResp {
@@ -110,16 +118,33 @@ func (c *httpClient) sendPOST(action string, payload io.Reader, tok *token) (*[]
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed while reading the response body.\nreason: %w", action, err)
+		return nil, fmt.Errorf(
+			"HTTP POST request for SOAP action %q failed "+
+				"while reading the response body.\nreason: %w",
+			action,
+			err,
+		)
 	}
 
 	if resp.StatusCode != 200 {
 		// TODO: Convert this case into a specific error type that allows the
 		// caller to retry explicitly.
 		if resp.StatusCode == 404 && action == queryAction {
-			return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed with 404 status code possibly due to credentials having expired.\nbody:%s", action, string(body))
+			return nil, fmt.Errorf(
+				"HTTP POST request for SOAP action %q failed with 404"+
+					"status code possibly due to credentials having expired.\n"+
+					"body:%s",
+				action,
+				string(body),
+			)
 		}
-		return nil, fmt.Errorf("HTTP POST request for SOAP action %q failed due to non-success status code: %d\nbody:%s", action, resp.StatusCode, string(body))
+		return nil, fmt.Errorf(
+			"HTTP POST request for SOAP action %q failed due to non-success"+
+				"status code: %d\nbody:%s",
+			action,
+			resp.StatusCode,
+			string(body),
+		)
 	}
 
 	return &body, nil

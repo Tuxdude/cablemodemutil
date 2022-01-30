@@ -48,7 +48,11 @@ func ParseRawStatus(status CableModemRawStatus) (*CableModemStatus, error) {
 }
 
 func actionResp(resp interface{}) actionResponseBody {
-	return actionResponseBody(resp.(map[string]interface{}))
+	body, ok := resp.(map[string]interface{})
+	if !ok {
+		panic(fmt.Sprintf("Cannot convert given type to actionResponseBody, data:%v", resp))
+	}
+	return actionResponseBody(body)
 }
 
 // Validates all the sub-responses within the status response were successful and have the expected payload.
@@ -65,32 +69,59 @@ func validateSubResponses(status CableModemRawStatus) error {
 // Validates a specific command's sub-response within the status response.
 func validateSubResponse(status CableModemRawStatus, cmd string) error {
 	key := actionResponseKey(cmd)
-	val, ok := status[key]
-	if !ok {
-		return fmt.Errorf("unable to find the response key %q in status response. response: %s", key, prettyPrintJSON(status))
+	val, keyExists := status[key]
+	if !keyExists {
+		return fmt.Errorf(
+			"unable to find the response key %q in status response. response: %s",
+			key,
+			prettyPrintJSON(status),
+		)
 	}
 
 	unpacked := actionResp(val)
 	key = actionResultKey(cmd)
-	result, ok := unpacked[key].(string)
-	if !ok {
-		return fmt.Errorf("unable to find the result key %q in status response. response: %s", key, prettyPrintJSON(status))
+	result, keyExists := unpacked[key].(string)
+	if !keyExists {
+		return fmt.Errorf(
+			"unable to find the result key %q in status response. response: %s",
+			key,
+			prettyPrintJSON(status),
+		)
 	}
 
 	if result != "OK" {
-		return fmt.Errorf("result in unpacked resposne is %q, expected \"OK\".\nunpacked response: %v", result, prettyPrintJSON(unpacked))
+		return fmt.Errorf(
+			"result in unpacked resposne is %q, expected \"OK\".\nunpacked response: %v",
+			result,
+			prettyPrintJSON(unpacked),
+		)
 	}
 	return nil
 }
 
 // Compare the values for the specified keys and emits a warning message if they differ.
-func warnIfMismatch(status CableModemRawStatus, desc string, expectedKey string, expectedSubKey string, compareAgainst map[string]string) {
+func warnIfMismatch(
+	status CableModemRawStatus,
+	desc string,
+	expectedKey string,
+	expectedSubKey string,
+	compareAgainst map[string]string,
+) {
 	expected := actionResp(status[expectedKey])[expectedSubKey]
 
 	for key, subKey := range compareAgainst {
 		actual := actionResp(status[key])[subKey]
 		if expected != actual {
-			log.Printf("Warning: %s information mismatch between %q[%q]=%q and %q[%q]=%q", desc, expectedKey, expectedSubKey, expected, key, subKey, actual)
+			log.Printf(
+				"Warning: %s information mismatch between %q[%q]=%q and %q[%q]=%q",
+				desc,
+				expectedKey,
+				expectedSubKey,
+				expected,
+				key,
+				subKey,
+				actual,
+			)
 		}
 	}
 }
@@ -113,8 +144,24 @@ func populateDeviceInfo(status CableModemRawStatus, result *DeviceInfo) error {
 		return err
 	}
 
-	warnIfMismatch(status, "Serial Number", "GetArrisRegisterInfoResponse", "SerialNumber", map[string]string{"GetCustomerStatusSoftwareResponse": "StatusSoftwareSerialNum"})
-	warnIfMismatch(status, "MAC Address", "GetArrisRegisterInfoResponse", "MacAddress", map[string]string{"GetCustomerStatusSoftwareResponse": "StatusSoftwareMac"})
+	warnIfMismatch(
+		status,
+		"Serial Number",
+		"GetArrisRegisterInfoResponse",
+		"SerialNumber",
+		map[string]string{
+			"GetCustomerStatusSoftwareResponse": "StatusSoftwareSerialNum",
+		},
+	)
+	warnIfMismatch(
+		status,
+		"MAC Address",
+		"GetArrisRegisterInfoResponse",
+		"MacAddress",
+		map[string]string{
+			"GetCustomerStatusSoftwareResponse": "StatusSoftwareMac",
+		},
+	)
 	return nil
 }
 
@@ -202,6 +249,7 @@ func populateSoftwareStatus(status CableModemRawStatus, result *SoftwareStatus) 
 }
 
 // Populates cable modem startup status.
+// nolint:funlen
 func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) error {
 	var err error
 	startup := actionResp(status["GetCustomerStatusStartupSequenceResponse"])
@@ -214,35 +262,64 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 	if err != nil {
 		return err
 	}
-	result.ConfigFile.Status, err = parseString(startup, "CustomerConnConfigurationFileStatus", "Configuration File Status")
+	result.ConfigFile.Status, err = parseString(
+		startup,
+		"CustomerConnConfigurationFileStatus",
+		"Configuration File Status",
+	)
 	if err != nil {
 		return err
 	}
-	result.ConfigFile.Comment, err = parseString(startup, "CustomerConnConfigurationFileComment", "Configuration File Comment")
+	result.ConfigFile.Comment, err = parseString(
+		startup,
+		"CustomerConnConfigurationFileComment",
+		"Configuration File Comment",
+	)
 	if err != nil {
 		return err
 	}
-	result.Connectivity.Status, err = parseString(startup, "CustomerConnConnectivityStatus", "Connectivity Status")
+	result.Connectivity.Status, err = parseString(
+		startup,
+		"CustomerConnConnectivityStatus",
+		"Connectivity Status",
+	)
 	if err != nil {
 		return err
 	}
-	result.Connectivity.Comment, err = parseString(startup, "CustomerConnConnectivityComment", "Connectivity Comment")
+	result.Connectivity.Comment, err = parseString(
+		startup,
+		"CustomerConnConnectivityComment",
+		"Connectivity Comment",
+	)
 	if err != nil {
 		return err
 	}
-	result.Downstream.FrequencyHZ, err = parseFreq(startup, "CustomerConnDSFreq", true, "Downstream Connection Frequency")
+	result.Downstream.FrequencyHZ, err = parseFreq(
+		startup, "CustomerConnDSFreq", true, "Downstream Connection Frequency")
 	if err != nil {
 		return err
 	}
-	result.Downstream.Comment, err = parseString(startup, "CustomerConnDSComment", "Downstream Connection Comment")
+	result.Downstream.Comment, err = parseString(
+		startup,
+		"CustomerConnDSComment",
+		"Downstream Connection Comment",
+	)
 	if err != nil {
 		return err
 	}
-	result.Security.Status, err = parseString(startup, "CustomerConnSecurityStatus", "Security Status")
+	result.Security.Status, err = parseString(
+		startup,
+		"CustomerConnSecurityStatus",
+		"Security Status",
+	)
 	if err != nil {
 		return err
 	}
-	result.Security.Comment, err = parseString(startup, "CustomerConnSecurityComment", "Security Comment")
+	result.Security.Comment, err = parseString(
+		startup,
+		"CustomerConnSecurityComment",
+		"Security Comment",
+	)
 	if err != nil {
 		return err
 	}
@@ -250,6 +327,7 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 }
 
 // populates cable modem connection status.
+// nolint:funlen
 func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStatus) error {
 	var err error
 	conn := actionResp(status["GetCustomerStatusConnectionInfoResponse"])
@@ -281,7 +359,12 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.DownstreamSignalPowerDBMV, err = parseSignalPowerInt(dev, "DownstreamSignalPower", true, "Downstream Signal Power")
+	result.DownstreamSignalPowerDBMV, err = parseSignalPowerInt(
+		dev,
+		"DownstreamSignalPower",
+		true,
+		"Downstream Signal Power",
+	)
 	if err != nil {
 		return err
 	}
@@ -328,7 +411,11 @@ func populateDownstreamChannels(status CableModemRawStatus) ([]DownstreamChannel
 		// The columns are:
 		// Row ID, Lock Status, Modulation, Channel ID, Frequency, Power, SNR, Corrected Err, Uncorrected Err, Blank
 		if len(cols) != 10 {
-			return nil, fmt.Errorf("expected 10 columns in a downstream channel, actual %d row=%q", len(cols), row)
+			return nil, fmt.Errorf(
+				"expected 10 columns in a downstream channel, actual %d row=%q",
+				len(cols),
+				row,
+			)
 		}
 
 		result[i].LockStatus = cols[1]
@@ -380,7 +467,11 @@ func populateUpstreamChannels(status CableModemRawStatus) ([]UpstreamChannelInfo
 		// The columns are:
 		// Row ID, Lock Status, Modulation, Channel ID, Width, Frequency, Power, Blank
 		if len(cols) != 8 {
-			return nil, fmt.Errorf("expected 8 columns in a upstream channel, actual %d row=%q", len(cols), row)
+			return nil, fmt.Errorf(
+				"expected 8 columns in a upstream channel, actual %d row=%q",
+				len(cols),
+				row,
+			)
 		}
 
 		result[i].LockStatus = cols[1]
@@ -424,7 +515,11 @@ func populateLogEntries(status CableModemRawStatus) ([]LogEntry, error) {
 		// The columns are:
 		// 0, Time, Date, 3, Log
 		if len(cols) != 5 {
-			return nil, fmt.Errorf("expected 5 columns in a log entry, actual %d row=%q", len(cols), row)
+			return nil, fmt.Errorf(
+				"expected 5 columns in a log entry, actual %d row=%q",
+				len(cols),
+				row,
+			)
 		}
 
 		result[i].Timestamp, err = parseLogTimestamp(cols[2], cols[1])

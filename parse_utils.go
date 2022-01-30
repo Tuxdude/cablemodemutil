@@ -18,7 +18,12 @@ const (
 func parseUint32(str string, hasSuffix bool, suffix string, desc string) (uint32, error) {
 	if hasSuffix {
 		if !strings.HasSuffix(str, suffix) {
-			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
+			return 0, fmt.Errorf(
+				"expected %s with %q suffix, but not available in %q",
+				desc,
+				suffix,
+				str,
+			)
 		}
 		str = strings.TrimSuffix(str, suffix)
 	}
@@ -166,14 +171,23 @@ func parseDurationStr(str string, desc string) (time.Duration, error) {
 	if err != nil {
 		return 0, fmt.Errorf("unable to parse hours in the specified %s timestamp %q, reason: %w", desc, str, err)
 	}
-	return (time.Duration(days) * 24 * time.Hour) + (time.Duration(hours) * time.Hour) + (time.Duration(mins) * time.Minute) + (time.Duration(secs) * time.Second), nil
+	res := days * 24 * time.Hour
+	res += time.Duration(hours) * time.Hour
+	res += time.Duration(mins) * time.Minute
+	res += time.Duration(secs) * time.Second
+	return res, nil
 }
 
 // Parses the time components with the specified suffix from the specified string.
 func parseTimeElementWithSuffix(str string, suffix string) (uint32, error) {
 	components := strings.Split(str, suffix)
 	if len(components) != 2 {
-		return 0, fmt.Errorf("unable to parse string %q (split: %d), expected to have suffix %q but did not", str, len(components), suffix)
+		return 0, fmt.Errorf(
+			"unable to parse string %q (split: %d), expected to have suffix %q but did not",
+			str,
+			len(components),
+			suffix,
+		)
 	}
 
 	num, err := strconv.ParseUint(components[0], 10, 32)
@@ -193,7 +207,7 @@ func parseLogEntry(str string) string {
 func parseString(data actionResponseBody, key string, desc string) (string, error) {
 	s, ok := data[key].(string)
 	if !ok {
-		return "", fmt.Errorf("unable to find key %q for parsing %q.data=%v", key, desc, data)
+		return "", fmt.Errorf("unable to find key %q while parsing %q.\ndata=%v", key, desc, data)
 	}
 	return s, nil
 }

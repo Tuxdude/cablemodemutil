@@ -61,9 +61,11 @@ type Retriever struct {
 type RetrieverInput struct {
 	// The host name or IP address of the cable modem device.
 	Host string
-	// The protocol used to connect to the cable modem, either "http" or "https".
+	// The protocol used to connect to the cable modem, either
+	// "http" or "https".
 	Protocol string
-	// If true skips verifying the cable modem's SSL certificate, false otherwise.
+	// If true skips verifying the cable modem's SSL certificate, false
+	// otherwise.
 	SkipVerifyCert bool
 	// User name for authenticating with the cable modem.
 	Username string
@@ -75,27 +77,36 @@ type RetrieverInput struct {
 
 // RetrieverDebug is used to specify the debugging options of the Retriever.
 type RetrieverDebug struct {
-	// If set to true logs additional debug information except for the requests and responses sent/received to/from the cable modem, false otherwise.
+	// If set to true logs additional debug information except for the
+	// requests and responses sent/received to/from the cable modem,
+	// false otherwise.
 	Debug bool
-	// If set to true logs additional debug information about the requests sent to the cable modem, false otherwise.
+	// If set to true logs additional debug information about the requests
+	// sent to the cable modem, false otherwise.
 	DebugReq bool
-	// If set to true logs additional debug information about the resposnes received from the cable modem, false otherwise.
+	// If set to true logs additional debug information about the resposnes
+	// received from the cable modem, false otherwise.
 	DebugResp bool
 }
 
-// The token object containing the state of the authenticated session with the cable modem.
+// The token object containing the state of the authenticated session with
+// the cable modem.
 type token struct {
-	// The UID of the session provided by the cable modem during authentication.
+	// The UID of the session provided by the cable modem during
+	// authentication.
 	uid string
-	// The private key of the session after authentication, generated based on public key, challenge from the cable modem and the supplied password.
+	// The private key of the session after authentication, generated based
+	// on public key, challenge from the cable modem and the supplied password.
 	privateKey string
 	// The expiry timestamp of the credentials stored in this session.
 	expiry time.Time
 }
 
-// Initial response from the cable modem to allow the client to initiate authentication.
+// Initial response from the cable modem to allow the client to initiate
+// authentication.
 type loginResponse struct {
-	// The UID of the session provided by the cable modem during authentication.
+	// The UID of the session provided by the cable modem during
+	// authentication.
 	uid string
 	// The public key provided by the cable modem during authentication.
 	publicKey string
@@ -103,10 +114,12 @@ type loginResponse struct {
 	challenge string
 }
 
-// actionRequest represents the payload of the request containing the SOAP action command.
+// actionRequest represents the payload of the request containing the SOAP
+// action command.
 type actionRequest map[string]string
 
-// actionResponse represents the payload of the response to a SOAP action command request.
+// actionResponse represents the payload of the response to a SOAP action
+// command request.
 type actionResponse map[string]interface{}
 
 // soapRequest represents the full SOAP request body.
@@ -122,7 +135,8 @@ func resetToken() *token {
 	}
 }
 
-// Encodes the specified payload for the specified action into a byte buffer to send this as a request.
+// Encodes the specified payload for the specified action into a byte buffer
+// to send this as a request.
 func encodePayload(action string, payload actionRequest) (*bytes.Buffer, error) {
 	req := soapRequest{
 		action: payload,
@@ -135,7 +149,8 @@ func encodePayload(action string, payload actionRequest) (*bytes.Buffer, error) 
 	return buf, nil
 }
 
-// Decodes the specified byte array response for the specified action into the response payload.
+// Decodes the specified byte array response for the specified action into the
+// response payload.
 func decodePayload(action string, resp *[]byte) (actionResponse, error) {
 	var payload soapResponse
 	err := json.Unmarshal(*resp, &payload)
@@ -149,31 +164,48 @@ func decodePayload(action string, resp *[]byte) (actionResponse, error) {
 func unpackResponse(action string, resp soapResponse) (actionResponse, error) {
 	if len(resp) != 1 {
 		return nil, fmt.Errorf(
-			"action: %s, invalid number of keys (%d) in response, expected 1.\nresponse: %v", action, len(resp), prettyPrintJSON(resp))
+			"action: %s, invalid number of keys (%d) in response, expected 1.\nresponse: %v",
+			action,
+			len(resp),
+			prettyPrintJSON(resp),
+		)
 	}
 
 	respKey := actionResponseKey(action)
 	unpacked, keyExists := resp[respKey]
 	if !keyExists {
 		return nil, fmt.Errorf(
-			"action: %s, unable to find the response key %q in response.\nresponse: %v", action, respKey, prettyPrintJSON(resp))
+			"action: %s, unable to find the response key %q in response.\nresponse: %v",
+			action,
+			respKey,
+			prettyPrintJSON(resp),
+		)
 	}
 
 	resultKey := actionResultKey(action)
 	result, keyExists := unpacked[resultKey]
 	if !keyExists {
 		return nil, fmt.Errorf(
-			"action: %s, unable to find the result key %q in unpacked response.\nunpacked response: %v", action, resultKey, prettyPrintJSON(unpacked))
+			"action: %s, unable to find the result key %q in unpacked response.\nunpacked response: %v",
+			action,
+			resultKey,
+			prettyPrintJSON(unpacked),
+		)
 	}
 	if result != "OK" {
 		return nil, fmt.Errorf(
-			"action: %s, result in unpacked resposne is %q, expected \"OK\".\nunpacked response: %v", action, result, prettyPrintJSON(unpacked))
+			"action: %s, result in unpacked resposne is %q, expected \"OK\".\nunpacked response: %v",
+			action,
+			result,
+			prettyPrintJSON(unpacked),
+		)
 	}
 
 	return unpacked, nil
 }
 
-// NewStatusRetriever returns a new retriever object that can be used to query the Cable Modem status.
+// NewStatusRetriever returns a new retriever object that can be used to
+// query the Cable Modem status.
 func NewStatusRetriever(input *RetrieverInput) *Retriever {
 	url := fmt.Sprintf(urlFormat, input.Protocol, input.Host)
 	r := Retriever{}
@@ -212,7 +244,8 @@ func (r *Retriever) getToken() *token {
 	return res
 }
 
-// Sends the SOAP request for the specified action containing the specified payload.
+// Sends the SOAP request for the specified action containing the specified
+// payload.
 func (r *Retriever) sendReq(action string, payload actionRequest, tok *token) (actionResponse, error) {
 	req, err := encodePayload(action, payload)
 	if err != nil {
@@ -225,7 +258,8 @@ func (r *Retriever) sendReq(action string, payload actionRequest, tok *token) (a
 	return decodePayload(action, resp)
 }
 
-// Retrieves the cookie, public key and challenge information from the cable modem that can be used for initiating an authentication request.
+// Retrieves the cookie, public key and challenge information from the cable
+// modem that can be used for initiating an authentication request.
 func (r *Retriever) getLoginResponse() (*loginResponse, error) {
 	payload := actionRequest{
 		"LoginPassword": "",
@@ -352,7 +386,8 @@ func (r *Retriever) RawStatus() (CableModemRawStatus, error) {
 	return nil, err
 }
 
-// Status retrieves and parses the current detailed status from the cable modem.
+// Status retrieves and parses the current detailed status from the cable
+// modem.
 func (r *Retriever) Status() (*CableModemStatus, error) {
 	raw, err := r.RawStatus()
 	if err != nil {
