@@ -29,8 +29,8 @@ func genPrivateKey(publicKey string, challenge string, clearPassword string) (st
 	return genHMACMD5(publicKey+clearPassword, challenge)
 }
 
-// Generates the hashed password using the private key, challenge and the clear password.
-func genHashedPassword(privateKey string, challenge string, clearPassword string) (string, error) {
+// Generates the hashed password using the private key and challenge.
+func genHashedPassword(privateKey string, challenge string) (string, error) {
 	return genHMACMD5(privateKey, challenge)
 }
 

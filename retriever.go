@@ -266,7 +266,7 @@ func (r *Retriever) getLoginResponse() (*loginResponse, error) {
 
 // Performs authentication with the cable modem and returns the response.
 func (r *Retriever) doAuth(challenge string, tok *token) error {
-	hashedPassword, err := genHashedPassword(tok.privateKey, challenge, r.clearPassword)
+	hashedPassword, err := genHashedPassword(tok.privateKey, challenge)
 	if err != nil {
 		return fmt.Errorf("auth failed while generating hashed password, reason: %w", err)
 	}
