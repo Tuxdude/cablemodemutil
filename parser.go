@@ -379,7 +379,7 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.DownstreamSignalPowerDBMV, err = parseSignalPowerInt(
+	result.DownstreamSignalPowerDBMV, err = parseSignalPower(
 		dev,
 		"DownstreamSignalPower",
 		true,
@@ -448,7 +448,7 @@ func populateDownstreamChannels(status CableModemRawStatus) ([]DownstreamChannel
 		if err != nil {
 			return nil, err
 		}
-		result[i].SignalPowerDBMV, err = parseSignalPowerIntStr(cols[5], false, "Downstream Channel Signal Power")
+		result[i].SignalPowerDBMV, err = parseSignalPowerStr(cols[5], false, "Downstream Channel Signal Power")
 		if err != nil {
 			return nil, err
 		}
@@ -508,7 +508,7 @@ func populateUpstreamChannels(status CableModemRawStatus) ([]UpstreamChannelInfo
 		if err != nil {
 			return nil, err
 		}
-		result[i].SignalPowerDBMV, err = parseSignalPowerFloatStr(cols[6], false, "Upstream Channel Signal Power")
+		result[i].SignalPowerDBMV, err = parseSignalPowerStr(cols[6], false, "Upstream Channel Signal Power")
 		if err != nil {
 			return nil, err
 		}

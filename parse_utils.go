@@ -35,22 +35,6 @@ func parseUint32(str string, hasSuffix bool, suffix string, desc string) (uint32
 	return uint32(res), nil
 }
 
-// Parses the specified string as an int32 after stripping the suffix if required.
-func parseInt32(str string, hasSuffix bool, suffix string, desc string) (int32, error) {
-	if hasSuffix {
-		if !strings.HasSuffix(str, suffix) {
-			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
-		}
-		str = strings.TrimSuffix(str, suffix)
-	}
-
-	res, err := strconv.ParseInt(str, 10, 32)
-	if err != nil {
-		return 0, fmt.Errorf("unable to convert %q to int32: %w", str, err)
-	}
-	return int32(res), nil
-}
-
 // Parses the specified string as a float64 after stripping the suffix if required.
 func parseFloat32(str string, hasSuffix bool, suffix string, desc string) (float32, error) {
 	if hasSuffix {
@@ -72,19 +56,14 @@ func parseFreqStr(str string, hasHzSuffix bool, desc string) (uint32, error) {
 	return parseUint32(str, hasHzSuffix, " Hz", desc)
 }
 
-// Parses the specified string as a signal power integer value after stripping the ' dBmV' suffix if required.
-func parseSignalPowerIntStr(str string, hasDBMVSuffix bool, desc string) (int32, error) {
-	return parseInt32(str, hasDBMVSuffix, " dBmV", desc)
-}
-
 // Parses the specified string as a signal power floating point value after stripping the ' dBmV' suffix if required.
-func parseSignalPowerFloatStr(str string, hasDBMVSuffix bool, desc string) (float32, error) {
+func parseSignalPowerStr(str string, hasDBMVSuffix bool, desc string) (float32, error) {
 	return parseFloat32(str, hasDBMVSuffix, " dBmV", desc)
 }
 
-// Parses the specified string as a signal SNR integer value after stripping the ' dB' suffix if required.
-func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (int32, error) {
-	return parseInt32(str, hasDBSuffix, " dB", desc)
+// Parses the specified string as a signal SNR floating point value after stripping the ' dB' suffix if required.
+func parseSignalSNRStr(str string, hasDBSuffix bool, desc string) (float32, error) {
+	return parseFloat32(str, hasDBSuffix, " dB", desc)
 }
 
 // Parses the specified string as a signal errors integer value.
@@ -214,17 +193,17 @@ func parseFreq(data actionResponseBody, key string, hasHzSuffix bool, desc strin
 	return parseFreqStr(s, hasHzSuffix, desc)
 }
 
-// Parses the value of the specified key as a signal power integer value in the specified status information.
-func parseSignalPowerInt(data actionResponseBody, key string, hasDBMVSuffix bool, desc string) (int32, error) {
+// Parses the value of the specified key as a signal power floating point value in the specified status information.
+func parseSignalPower(data actionResponseBody, key string, hasDBMVSuffix bool, desc string) (float32, error) {
 	s, err := parseString(data, key, desc)
 	if err != nil {
 		return 0, err
 	}
-	return parseSignalPowerIntStr(s, hasDBMVSuffix, desc)
+	return parseSignalPowerStr(s, hasDBMVSuffix, desc)
 }
 
-// Parses the value of the specified key as a signal SNR integer value in the specified status information.
-func parseSignalSNR(data actionResponseBody, key string, hasDBSuffix bool, desc string) (int32, error) {
+// Parses the value of the specified key as a signal SNR floating point value in the specified status information.
+func parseSignalSNR(data actionResponseBody, key string, hasDBSuffix bool, desc string) (float32, error) {
 	s, err := parseString(data, key, desc)
 	if err != nil {
 		return 0, err

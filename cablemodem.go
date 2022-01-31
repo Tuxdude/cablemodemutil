@@ -121,9 +121,9 @@ type DownstreamChannelInfo struct {
 	// Frequency of the channel in Hz.
 	FrequencyHZ uint32
 	// Signal Power in dB mV.
-	SignalPowerDBMV int32
+	SignalPowerDBMV float32
 	// Signal SNR/MER in dB.
-	SignalSNRMERDB int32
+	SignalSNRMERDB float32
 	// Corrected errors.
 	CorrectedErrors uint32
 	// Uncorrected errors.
@@ -163,9 +163,9 @@ type ConnectionStatus struct {
 	// Primary Downstream channel frequency for the connection.
 	DownstreamFrequencyHZ uint32
 	// Primary Downstream channel signal power in dB mV.
-	DownstreamSignalPowerDBMV int32
+	DownstreamSignalPowerDBMV float32
 	// Primary Downstream channel signal SNR in dB.
-	DownstreamSignalSNRDB int32
+	DownstreamSignalSNRDB float32
 	// Primary upstream channel ID.
 	UpstreamChannelID uint32
 	// Downstream channel information.
