@@ -155,9 +155,9 @@ type ConnectionStatus struct {
 	// Duration for which the connection has been up.
 	UpTime time.Duration
 	// DOCSIS network access status.
-	DOCSISNetworkAccess string
+	DOCSISNetworkAccessAllowed bool
 	// Internet connection status.
-	InternetConnectionStatus string
+	InternetConnected bool
 	// Downstream plan for the connection.
 	DownstreamPlan string
 	// Primary Downstream channel frequency for the connection.
