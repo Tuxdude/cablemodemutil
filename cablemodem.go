@@ -56,42 +56,6 @@ type SoftwareStatus struct {
 	DOCSISSpecVersion string
 }
 
-// DownstreamChannelInfo contains Cable Modem Downstream channel information.
-type DownstreamChannelInfo struct {
-	// Lock status.
-	LockStatus string
-	// Modulation.
-	Modulation string
-	// Channel ID.
-	ChannelID uint8
-	// Frequency of the channel in Hz.
-	FrequencyHZ uint32
-	// Signal Power in dB mV.
-	SignalPowerDBMV int32
-	// Signal SNR/MER in dB.
-	SignalSNRMERDB int32
-	// Corrected errors.
-	CorrectedErrors uint32
-	// Uncorrected errors.
-	UncorrectedErrors uint32
-}
-
-// UpstreamChannelInfo contains Cable Modem Upstream channel information.
-type UpstreamChannelInfo struct {
-	// Lock status.
-	LockStatus string
-	// Modulation.
-	Modulation string
-	// Channel ID.
-	ChannelID uint8
-	// Width of the channel in Hz.
-	WidthHZ uint32
-	// Frequency of the channel in Hz.
-	FrequencyHZ uint32
-	// Signal Power in dB mV.
-	SignalPowerDBMV float32
-}
-
 // BootStatus contains Cable Modem Startup Boot status.
 type BootStatus struct {
 	// Boot status.
@@ -144,6 +108,42 @@ type StartupStatus struct {
 	Downstream DownstreamStatus
 	// Security status.
 	Security SecurityStatus
+}
+
+// DownstreamChannelInfo contains Cable Modem Downstream channel information.
+type DownstreamChannelInfo struct {
+	// Lock status.
+	LockStatus string
+	// Modulation.
+	Modulation string
+	// Channel ID.
+	ChannelID uint8
+	// Frequency of the channel in Hz.
+	FrequencyHZ uint32
+	// Signal Power in dB mV.
+	SignalPowerDBMV int32
+	// Signal SNR/MER in dB.
+	SignalSNRMERDB int32
+	// Corrected errors.
+	CorrectedErrors uint32
+	// Uncorrected errors.
+	UncorrectedErrors uint32
+}
+
+// UpstreamChannelInfo contains Cable Modem Upstream channel information.
+type UpstreamChannelInfo struct {
+	// Lock status.
+	LockStatus string
+	// Modulation.
+	Modulation string
+	// Channel ID.
+	ChannelID uint8
+	// Width of the channel in Hz.
+	WidthHZ uint32
+	// Frequency of the channel in Hz.
+	FrequencyHZ uint32
+	// Signal Power in dB mV.
+	SignalPowerDBMV float32
 }
 
 // ConnectionStatus contains Cable Modem Connection status.
