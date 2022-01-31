@@ -113,7 +113,7 @@ type StartupStatus struct {
 // DownstreamChannelInfo contains Cable Modem Downstream channel information.
 type DownstreamChannelInfo struct {
 	// Lock status.
-	LockStatus string
+	Locked bool
 	// Modulation.
 	Modulation string
 	// Channel ID.
@@ -133,7 +133,7 @@ type DownstreamChannelInfo struct {
 // UpstreamChannelInfo contains Cable Modem Upstream channel information.
 type UpstreamChannelInfo struct {
 	// Lock status.
-	LockStatus string
+	Locked bool
 	// Modulation.
 	Modulation string
 	// Channel ID.

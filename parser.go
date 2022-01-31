@@ -438,7 +438,7 @@ func populateDownstreamChannels(status CableModemRawStatus) ([]DownstreamChannel
 			)
 		}
 
-		result[i].LockStatus = cols[1]
+		result[i].Locked = cols[1] == "LOCKED"
 		result[i].Modulation = cols[2]
 		result[i].ChannelID, err = parseChannelIDStr(cols[3], "Downstream Channel ID")
 		if err != nil {
@@ -494,7 +494,7 @@ func populateUpstreamChannels(status CableModemRawStatus) ([]UpstreamChannelInfo
 			)
 		}
 
-		result[i].LockStatus = cols[1]
+		result[i].Locked = cols[1] == "LOCKED"
 		result[i].Modulation = cols[2]
 		result[i].ChannelID, err = parseChannelIDStr(cols[3], "Upstream Channel ID")
 		if err != nil {
