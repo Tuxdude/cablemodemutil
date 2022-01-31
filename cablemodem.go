@@ -117,7 +117,7 @@ type DownstreamChannelInfo struct {
 	// Modulation.
 	Modulation string
 	// Channel ID.
-	ChannelID uint8
+	ChannelID uint32
 	// Frequency of the channel in Hz.
 	FrequencyHZ uint32
 	// Signal Power in dB mV.
@@ -137,7 +137,7 @@ type UpstreamChannelInfo struct {
 	// Modulation.
 	Modulation string
 	// Channel ID.
-	ChannelID uint8
+	ChannelID uint32
 	// Width of the channel in Hz.
 	WidthHZ uint32
 	// Frequency of the channel in Hz.
@@ -167,7 +167,7 @@ type ConnectionStatus struct {
 	// Primary Downstream channel signal SNR in dB.
 	DownstreamSignalSNRDB int32
 	// Primary upstream channel ID.
-	UpstreamChannelID uint8
+	UpstreamChannelID uint32
 	// Downstream channel information.
 	DownstreamChannels []DownstreamChannelInfo
 	// Upstream channel information.

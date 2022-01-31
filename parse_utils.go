@@ -35,22 +35,6 @@ func parseUint32(str string, hasSuffix bool, suffix string, desc string) (uint32
 	return uint32(res), nil
 }
 
-// Parses the specified string as an uint8 after stripping the suffix if required.
-func parseUint8(str string, hasSuffix bool, suffix string, desc string) (uint8, error) {
-	if hasSuffix {
-		if !strings.HasSuffix(str, suffix) {
-			return 0, fmt.Errorf("expected %s with %q suffix, but not available in %q", desc, suffix, str)
-		}
-		str = strings.TrimSuffix(str, suffix)
-	}
-
-	res, err := strconv.ParseUint(str, 10, 8)
-	if err != nil {
-		return 0, fmt.Errorf("unable to convert %q to uint8: %w", str, err)
-	}
-	return uint8(res), nil
-}
-
 // Parses the specified string as an int32 after stripping the suffix if required.
 func parseInt32(str string, hasSuffix bool, suffix string, desc string) (int32, error) {
 	if hasSuffix {
@@ -109,8 +93,8 @@ func parseSignalErrorsStr(str string, desc string) (uint32, error) {
 }
 
 // Parses the specified string as a channel ID value.
-func parseChannelIDStr(str string, desc string) (uint8, error) {
-	return parseUint8(str, false, "", desc)
+func parseChannelIDStr(str string, desc string) (uint32, error) {
+	return parseUint32(str, false, "", desc)
 }
 
 // Parses the log timestamp from the specified date and time string values.
@@ -249,7 +233,7 @@ func parseSignalSNR(data actionResponseBody, key string, hasDBSuffix bool, desc 
 }
 
 // Parses the value of the specified key as a channel ID integer value in the specified status information.
-func parseChannelID(data actionResponseBody, key string, desc string) (uint8, error) {
+func parseChannelID(data actionResponseBody, key string, desc string) (uint32, error) {
 	s, err := parseString(data, key, desc)
 	if err != nil {
 		return 0, err
