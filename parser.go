@@ -254,17 +254,23 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 	var err error
 	startup := actionResp(status["GetCustomerStatusStartupSequenceResponse"])
 
-	result.Boot.Status, err = parseString(startup, "CustomerConnBootStatus", "Boot Status")
+	result.Boot.Status, err = parseBool(startup, "CustomerConnBootStatus", "OK", "Boot Status")
 	if err != nil {
 		return err
 	}
-	result.Boot.Comment, err = parseString(startup, "CustomerConnBootComment", "Boot Comment")
+	result.Boot.Operational, err = parseBool(
+		startup,
+		"CustomerConnBootComment",
+		"Operational",
+		"Boot Comment",
+	)
 	if err != nil {
 		return err
 	}
-	result.ConfigFile.Status, err = parseString(
+	result.ConfigFile.Status, err = parseBool(
 		startup,
 		"CustomerConnConfigurationFileStatus",
+		"OK",
 		"Configuration File Status",
 	)
 	if err != nil {
@@ -278,17 +284,19 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 	if err != nil {
 		return err
 	}
-	result.Connectivity.Status, err = parseString(
+	result.Connectivity.Status, err = parseBool(
 		startup,
 		"CustomerConnConnectivityStatus",
+		"OK",
 		"Connectivity Status",
 	)
 	if err != nil {
 		return err
 	}
-	result.Connectivity.Comment, err = parseString(
+	result.Connectivity.Operational, err = parseBool(
 		startup,
 		"CustomerConnConnectivityComment",
+		"Operational",
 		"Connectivity Comment",
 	)
 	if err != nil {
@@ -299,17 +307,19 @@ func populateStartupStatus(status CableModemRawStatus, result *StartupStatus) er
 	if err != nil {
 		return err
 	}
-	result.Downstream.Comment, err = parseString(
+	result.Downstream.Locked, err = parseBool(
 		startup,
 		"CustomerConnDSComment",
+		"Locked",
 		"Downstream Connection Comment",
 	)
 	if err != nil {
 		return err
 	}
-	result.Security.Status, err = parseString(
+	result.Security.Enabled, err = parseBool(
 		startup,
 		"CustomerConnSecurityStatus",
+		"Enabled",
 		"Security Status",
 	)
 	if err != nil {

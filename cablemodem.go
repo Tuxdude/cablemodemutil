@@ -59,15 +59,15 @@ type SoftwareStatus struct {
 // BootStatus contains Cable Modem Startup Boot status.
 type BootStatus struct {
 	// Boot status.
-	Status string
-	// Comments.
-	Comment string
+	Status bool
+	// Operational.
+	Operational bool
 }
 
 // ConfigFileStatus contains Cable Modem Startup Configuration file status.
 type ConfigFileStatus struct {
 	// Configuration file status.
-	Status string
+	Status bool
 	// Comments.
 	Comment string
 }
@@ -75,23 +75,23 @@ type ConfigFileStatus struct {
 // ConnectivityStatus contains Cable Modem Startup Connectivity status.
 type ConnectivityStatus struct {
 	// Connectivity status.
-	Status string
-	// Comments.
-	Comment string
+	Status bool
+	// Operational.
+	Operational bool
 }
 
 // DownstreamStatus contains Cable Modem Startup Downstream Connection status.
 type DownstreamStatus struct {
 	// Frequency in Hz for the Downstream channel connection.
 	FrequencyHZ uint32
-	// Comments.
-	Comment string
+	// Locked.
+	Locked bool
 }
 
 // SecurityStatus contains Cable Modem Startup Security status.
 type SecurityStatus struct {
 	// Security status.
-	Status string
+	Enabled bool
 	// Comments.
 	Comment string
 }
