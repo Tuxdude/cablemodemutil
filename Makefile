@@ -29,27 +29,33 @@ endif
 ECHO := echo -e
 
 # go and related binaries.
-GO_CMD          := go
-GO_IMPORTS_CMD  := goimports
-GO_FMT_CMD      := gofmt
-GO_LINT_CMD     := golint
-GO_CI_LINT_CMD  := golangci-lint
+GO_CMD            := go
+GO_IMPORTS_CMD    := goimports
+GO_FMT_CMD        := gofmt
+GO_LINT_CMD       := golint
+GO_CI_LINT_CMD    := golangci-lint
+GO_RELEASER       := goreleaser
 
 # Commands invoked from rules.
-GOBUILD         := $(GO_CMD) build
-GOSTRIPPEDBUILD := CGO_ENABLED=0 GOOS=linux $(GO_CMD) build -a -ldflags "-s -w" -installsuffix cgo
-GOCLEAN         := $(GO_CMD) clean
-GOGET           := $(GO_CMD) get -u
-GOLIST          := $(GO_CMD) list
-GOMOD           := $(GO_CMD) mod
-GOTEST          := $(GO_CMD) test -v
-GOCOVERAGE      := $(GO_CMD) test -v -race -coverprofile coverage.out -covermode atomic
-GOVET           := $(GO_CMD) vet
-GOIMPORTS       := $(GO_IMPORTS_CMD) -w
-GOFMT           := $(GO_FMT_CMD) -s -w
-GOLINT          := $(GO_LINT_CMD) -set_exit_status -min_confidence 0.200001
-GOLINTAGG       := $(GO_LINT_CMD) -set_exit_status -min_confidence 0
-GOLANGCILINT    := $(GO_CI_LINT_CMD) run
+GOBUILD           := $(GO_CMD) build
+GOSTRIPPEDBUILD   := CGO_ENABLED=0 GOOS=linux $(GO_CMD) build -a -ldflags "-s -w" -installsuffix cgo
+GOCLEAN           := $(GO_CMD) clean
+GOGENERATE        := $(GO_CMD) generate
+GOGET             := $(GO_CMD) get -u
+GOLIST            := $(GO_CMD) list
+GOMOD             := $(GO_CMD) mod
+GOTEST            := $(GO_CMD) test -v
+GOCOVERAGE        := $(GO_CMD) test -v -race -coverprofile coverage.out -covermode atomic
+GOVET             := $(GO_CMD) vet
+GOIMPORTS         := $(GO_IMPORTS_CMD) -w
+GOFMT             := $(GO_FMT_CMD) -s -w
+GOLINT            := $(GO_LINT_CMD) -set_exit_status -min_confidence 0.200001
+GOLINTAGG         := $(GO_LINT_CMD) -set_exit_status -min_confidence 0
+GOLANGCILINT      := $(GO_CI_LINT_CMD) run
+GORELEASERRELEASE := $(GO_RELEASER) release
+GORELEASERCHECK   := $(GO_RELEASER) check
+INSTALL_GORELEASER_HOOK_PREREQS   := $(GO_CMD) install \
+    github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 # Alternative for running golangci-lint, using docker instead:
 # docker run \
@@ -82,31 +88,7 @@ else
     DEP_PKGS := $(addsuffix @master,$(DEP_PKGS))
 endif
 
-all: fiximports fmt lint vet build test
-
-clean:
-	$(call ExecWithMsg,Cleaning,$(GOCLEAN) ./...)
-
-fiximports:
-	$(call ExecWithMsg,Fixing imports,$(GOIMPORTS) .)
-
-fmt:
-	$(call ExecWithMsg,Fixing formatting,$(GOFMT) .)
-
-lint: tidy
-	$(call ExecWithMsg,Linting,$(GOLINT) . && $(GOLANGCILINT))
-
-lintagg: tidy
-	$(call ExecWithMsg,Aggressive Linting,$(GOLINTAGG) . && $(GOLANGCILINT))
-
-vet: tidy
-	$(call ExecWithMsg,Vetting,$(GOVET) ./...)
-
-tidy:
-	$(call ExecWithMsg,Tidying module,$(GOMOD) tidy)
-
-deps_update:
-	$(call ExecWithMsg,Updating to the latest version of dependencies for \"$(DEP_PKGS_TEXT)\",$(GOGET) $(DEP_PKGS))
+all: fiximports generate fmt lint vet build test
 
 build: tidy
 	$(call ExecWithMsg,Building,$(GOBUILD) ./...)
@@ -114,11 +96,54 @@ build: tidy
 buildstripped: tidy
 	$(call ExecWithMsg,Building Stripped,$(GOSTRIPPEDBUILD) ./...)
 
-test: tidy
-	$(call ExecWithMsg,Testing,$(GOTEST) ./...)
+clean:
+	$(call ExecWithMsg,Cleaning,$(GOCLEAN) ./...)
 
 coverage: tidy
 	$(call ExecWithMsg,Testing with Coverage generation,$(GOCOVERAGE) ./...)
 
-.PHONY: all clean fiximports fmt lint lintagg vet tidy deps_update
-.PHONY: build buildstripped test coverage
+deps_update:
+	$(call ExecWithMsg,Updating to the latest version of dependencies for \"$(DEP_PKGS_TEXT)\",$(GOGET) $(DEP_PKGS))
+
+fiximports:
+	$(call ExecWithMsg,Fixing imports,$(GOIMPORTS) .)
+
+fmt:
+	$(call ExecWithMsg,Fixing formatting,$(GOFMT) .)
+
+generate:
+	$(call ExecWithMsg,Generating,$(GOCLEAN) ./...)
+
+goreleaser_check_config:
+	$(call ExecWithMsg,GoReleaser Checking config,$(GORELEASERCHECK))
+
+goreleaser_local_release:
+	$(call ExecWithMsg,GoReleaser Building Local Release,$(GORELEASERRELEASE) --snapshot --rm-dist)
+
+goreleaser_verify_install_prereqs:
+	$(call ExecWithMsg,GoReleaser Pre-Release Installing Prereqs,$(INSTALL_GORELEASER_HOOK_PREREQS))
+
+goreleaser_verify: goreleaser_verify_install_prereqs generate fmt lint_golangci_lint_only vet build test
+
+test: tidy
+	$(call ExecWithMsg,Testing,$(GOTEST) ./...)
+
+tidy:
+	$(call ExecWithMsg,Tidying module,$(GOMOD) tidy)
+
+lint: tidy
+	$(call ExecWithMsg,Linting,$(GOLINT) . && $(GOLANGCILINT))
+
+lint_agg: tidy
+	$(call ExecWithMsg,Aggressive Linting,$(GOLINTAGG) . && $(GOLANGCILINT))
+
+lint_golangci_lint_only: tidy
+	$(call ExecWithMsg,Linting (golangci-lint only),$(GOLANGCILINT))
+
+vet: tidy
+	$(call ExecWithMsg,Vetting,$(GOVET) ./...)
+
+.PHONY: all build buildstripped clean coverage deps_update fiximports
+.PHONY: fmt generate goreleaser_check_config goreleaser_local_release
+.PHONY: goreleaser_verify_install_prereqs goreleaser_verify test tidy lint
+.PHONY: lint_agg lint_golangci_lint_only vet
