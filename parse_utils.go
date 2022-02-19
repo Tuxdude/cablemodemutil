@@ -30,7 +30,7 @@ func parseUint32(str string, hasSuffix bool, suffix string, desc string) (uint32
 
 	res, err := strconv.ParseUint(str, 10, 32)
 	if err != nil {
-		return 0, fmt.Errorf("unable to convert %q to uint32: %w", str, err)
+		return 0, fmt.Errorf("parsing %q, unable to convert %q to uint32: %w", desc, str, err)
 	}
 	return uint32(res), nil
 }
@@ -46,7 +46,7 @@ func parseFloat32(str string, hasSuffix bool, suffix string, desc string) (float
 
 	res, err := strconv.ParseFloat(str, 32)
 	if err != nil {
-		return 0, fmt.Errorf("unable to convert %q to float32: %w", str, err)
+		return 0, fmt.Errorf("parsing %q, unable to convert %q to float32: %w", desc, str, err)
 	}
 	return float32(res), nil
 }
