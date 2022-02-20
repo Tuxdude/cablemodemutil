@@ -370,15 +370,36 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.DownstreamPlan, err = parseString(config, "DownstreamPlan", "Downstream Plan")
+	err = populateDownstreamConnectionStatus(status, &result.Downstream)
 	if err != nil {
 		return err
 	}
-	result.DownstreamFrequencyHZ, err = parseFreq(config, "DownstreamFrequency", false, "Downstream Frequency")
+	result.UpstreamChannelID, err = parseChannelID(config, "UpstreamChannelId", "Upstream Channel ID")
 	if err != nil {
 		return err
 	}
-	result.DownstreamSignalPowerDBMV, err = parseSignalPower(
+	result.UpstreamChannels, err = populateUpstreamChannels(status)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func populateDownstreamConnectionStatus(status CableModemRawStatus, result *DownstreamConnectionStatus) error {
+	var err error
+	dev := actionResp(status["GetArrisDeviceStatusResponse"])
+	config := actionResp(status["GetArrisConfigurationInfoResponse"])
+
+	result.Plan, err = parseString(config, "DownstreamPlan", "Downstream Plan")
+	if err != nil {
+		return err
+	}
+	result.FrequencyHZ, err = parseFreq(config, "DownstreamFrequency", false, "Downstream Frequency")
+	if err != nil {
+		return err
+	}
+	result.SignalPowerDBMV, err = parseSignalPower(
 		dev,
 		"DownstreamSignalPower",
 		true,
@@ -387,19 +408,11 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.DownstreamSignalSNRDB, err = parseSignalSNR(dev, "DownstreamSignalSnr", true, "Downstream Signal SNR")
+	result.SignalSNRDB, err = parseSignalSNR(dev, "DownstreamSignalSnr", true, "Downstream Signal SNR")
 	if err != nil {
 		return err
 	}
-	result.UpstreamChannelID, err = parseChannelID(config, "UpstreamChannelId", "Upstream Channel ID")
-	if err != nil {
-		return err
-	}
-	result.DownstreamChannels, err = populateDownstreamChannels(status)
-	if err != nil {
-		return err
-	}
-	result.UpstreamChannels, err = populateUpstreamChannels(status)
+	result.Channels, err = populateDownstreamChannels(status)
 	if err != nil {
 		return err
 	}

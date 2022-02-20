@@ -146,6 +146,21 @@ type UpstreamChannelInfo struct {
 	SignalPowerDBMV float32
 }
 
+// DownstreamConnectionStatus contains Cable Modem Connection status
+// pertaining to the downstream channels of the connection.
+type DownstreamConnectionStatus struct {
+	// Downstream plan for the connection.
+	Plan string
+	// Primary Downstream channel frequency for the connection.
+	FrequencyHZ uint32
+	// Primary Downstream channel signal power in dB mV.
+	SignalPowerDBMV float32
+	// Primary Downstream channel signal SNR in dB.
+	SignalSNRDB float32
+	// Downstream channel information.
+	Channels []DownstreamChannelInfo
+}
+
 // ConnectionStatus contains Cable Modem Connection status.
 type ConnectionStatus struct {
 	// Current system time on the device when the query was run.
@@ -156,18 +171,10 @@ type ConnectionStatus struct {
 	DOCSISNetworkAccessAllowed bool
 	// Internet connection status.
 	InternetConnected bool
-	// Downstream plan for the connection.
-	DownstreamPlan string
-	// Primary Downstream channel frequency for the connection.
-	DownstreamFrequencyHZ uint32
-	// Primary Downstream channel signal power in dB mV.
-	DownstreamSignalPowerDBMV float32
-	// Primary Downstream channel signal SNR in dB.
-	DownstreamSignalSNRDB float32
+	// Downstream connection status.
+	Downstream DownstreamConnectionStatus
 	// Primary upstream channel ID.
 	UpstreamChannelID uint32
-	// Downstream channel information.
-	DownstreamChannels []DownstreamChannelInfo
 	// Upstream channel information.
 	UpstreamChannels []UpstreamChannelInfo
 }
