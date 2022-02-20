@@ -352,7 +352,6 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.EstablishedAt = result.SystemTime.Add(-result.UpTime)
 	result.DOCSISNetworkAccessAllowed, err = parseBool(
 		conn,
 		"CustomerConnNetworkAccess",

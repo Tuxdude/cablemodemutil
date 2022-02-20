@@ -148,9 +148,7 @@ type UpstreamChannelInfo struct {
 
 // ConnectionStatus contains Cable Modem Connection status.
 type ConnectionStatus struct {
-	// Time at which connection was established (System Time - Up Time).
-	EstablishedAt time.Time
-	// Current system time on the device.
+	// Current system time on the device when the query was run.
 	SystemTime time.Time
 	// Duration for which the connection has been up.
 	UpTime time.Duration
