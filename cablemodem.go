@@ -83,7 +83,7 @@ type ConnectivityStatus struct {
 // DownstreamStatus contains Cable Modem Startup Downstream Connection status.
 type DownstreamStatus struct {
 	// Frequency in Hz for the Downstream channel connection.
-	FrequencyHZ uint32
+	FrequencyHZ float32
 	// Locked.
 	Locked bool
 }
@@ -119,7 +119,7 @@ type DownstreamChannelInfo struct {
 	// Channel ID.
 	ChannelID uint32
 	// Frequency of the channel in Hz.
-	FrequencyHZ uint32
+	FrequencyHZ float32
 	// Signal Power in dB mV.
 	SignalPowerDBMV float32
 	// Signal SNR/MER in dB.
@@ -139,9 +139,9 @@ type UpstreamChannelInfo struct {
 	// Channel ID.
 	ChannelID uint32
 	// Width of the channel in Hz.
-	WidthHZ uint32
+	WidthHZ float32
 	// Frequency of the channel in Hz.
-	FrequencyHZ uint32
+	FrequencyHZ float32
 	// Signal Power in dB mV.
 	SignalPowerDBMV float32
 }
@@ -152,7 +152,7 @@ type DownstreamConnectionStatus struct {
 	// Downstream plan for the connection.
 	Plan string
 	// Primary Downstream channel frequency for the connection.
-	FrequencyHZ uint32
+	FrequencyHZ float32
 	// Primary Downstream channel signal power in dB mV.
 	SignalPowerDBMV float32
 	// Primary Downstream channel signal SNR in dB.

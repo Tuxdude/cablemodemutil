@@ -52,8 +52,8 @@ func parseFloat32(str string, hasSuffix bool, suffix string, desc string) (float
 }
 
 // Parses the specified string as a channel frequency after stripping the ' Hz' suffix if required.
-func parseFreqStr(str string, hasHzSuffix bool, desc string) (uint32, error) {
-	return parseUint32(str, hasHzSuffix, " Hz", desc)
+func parseFreqStr(str string, hasHzSuffix bool, desc string) (float32, error) {
+	return parseFloat32(str, hasHzSuffix, " Hz", desc)
 }
 
 // Parses the specified string as a signal power floating point value after stripping the ' dBmV' suffix if required.
@@ -185,7 +185,7 @@ func parseBool(data actionResponseBody, key string, trueVal string, desc string)
 }
 
 // Parses the value of the specified key as a channel frequency in the specified status information.
-func parseFreq(data actionResponseBody, key string, hasHzSuffix bool, desc string) (uint32, error) {
+func parseFreq(data actionResponseBody, key string, hasHzSuffix bool, desc string) (float32, error) {
 	s, err := parseString(data, key, desc)
 	if err != nil {
 		return 0, err
