@@ -1,0 +1,50 @@
+---
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Release
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # We need to do this because of:
+      # https://github.com/actions/checkout/issues/290 and its side-effects
+      # as https://github.com/goreleaser/goreleaser/issues/2919
+      - name: Fetch full annotated tags metadata
+        run: git fetch --force --tags
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Import Release Signing GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.RELEASE_SIGNING_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.RELEASE_SIGNING_GPG_PASSPHRASE }}
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
