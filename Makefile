@@ -43,7 +43,7 @@ GOBUILD                           := $(GO_CMD) build
 GOSTRIPPEDBUILD                   := CGO_ENABLED=0 GOOS=linux $(GO_CMD) build -a -ldflags "-s -w" -installsuffix cgo
 GOCLEAN                           := $(GO_CMD) clean
 GOGENERATE                        := $(GO_CMD) generate
-GOGET                             := $(GO_CMD) get -u
+GOGET                             := $(GO_CMD) get
 GOLIST                            := $(GO_CMD) list
 GOMOD                             := $(GO_CMD) mod
 GOTEST                            := $(GO_CMD) test -v
@@ -120,14 +120,14 @@ deps_list_latest_version:
 .PHONY: deps_list_latest_version
 
 deps_update_tuxdude_latest_only:
-	$(call ExecWithMsg,Updating to the latest version of dependencies for \"$(DEP_PKGS_TEXT)\",$(GOGET) -t -u=patch $(DEP_PKGS))
+	$(call ExecWithMsg,Updating to the latest version of dependencies for \"$(DEP_PKGS_TEXT)\",$(GOGET) -t -u $(DEP_PKGS))
 .PHONY: deps_update_tuxdude_latest_only
 
 deps_update_tuxdude_latest: deps_update_tuxdude_latest_only tidy
 .PHONY: deps_update_tuxdude_latest
 
 deps_update_only:
-	$(call ExecWithMsg,Updating to the latest version of all direct dependencies,$(GOGET) -t -u=patch ./...)
+	$(call ExecWithMsg,Updating to the latest version of all direct dependencies,$(GOGET) -t -u ./...)
 .PHONY: deps_update_only
 
 deps_update: deps_update_only tidy
