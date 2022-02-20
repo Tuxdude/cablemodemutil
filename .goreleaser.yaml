@@ -1,0 +1,106 @@
+before:
+  hooks:
+    # Run all pre-checks before goreleaser cuts a release.
+    - make goreleaser_verify
+builds:
+  - env:
+      - GO111MODULE=on
+      # Disable CGO (i.e. binary will be statically linked).
+      - CGO_ENABLED=0
+
+    flags:
+      # Trim the path for reproducible builds.
+      - -trimpath
+    ldflags:
+      # Strip debugging symbols.
+      - -s -w
+      # Include version and commit information (uses commit date for
+      # reproducible builds).
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.CommitDate}}
+    # Use the commit timestamp as the binary's modified timestamp.
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    # Set to true only for library projects.
+    skip: true
+    # Target platform and architectures.
+    targets:
+      - linux_amd64
+      - linux_386
+      - linux_arm64
+      - linux_arm_6
+      - linux_arm_7
+      - darwin_amd64
+      - darwin_arm64
+      - windows_amd64
+      - windows_386
+      - windows_arm64
+      - windows_arm_6
+      - windows_arm_7
+archives:
+  # Package in tar.xz format except for Windows (uses .zip instead).
+  - format: tar.xz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
+    replacements:
+      darwin: macOS
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+universal_binaries:
+  # Build a universal fat binary for macOS (i.e. build a single binary
+  # which contains the binaries for all architectures under macOS) packaged
+  # into a single archive, and delete the other single architecture macOS
+  # archives.
+  - replace: true
+source:
+  enabled: true
+  name_template: "{{ .ProjectName }}-v{{ .Version }}-src"
+  format: tar.xz
+checksum:
+  # Checksum configuration.
+  name_template: 'checksums.txt'
+  algorithm: sha256
+signs:
+  - signature: "${artifact}.sig"
+    cmd: gpg
+    args:
+      - "-u"
+      - "8D458AC08D2CE9CE"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+    artifacts: all
+gomod:
+  # Load dependencies using proxy.golang.org to create a verifiable build.
+  proxy: true
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
+  gobinary: go
+snapshot:
+  # Custom naming for snapshot builds.
+  name_template: "{{ incpatch .Version }}-dev-{{ .ShortCommit }}"
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+release:
+  draft: false
+  discussion_category_name: Releases
+  prerelease: auto
+  mode: keep-existing
+  header: |
+    ## Released {{ time "Mon, Jan 2 2006 03:04 PM UTC-0700" }}
+    {{ .TagContents }}
+  footer: |
+    ## Thanks!
+    Those include all the new changes in the {{ .Tag }} release!
+  name_template: "{{.ProjectName}} v{{.Version}}"
