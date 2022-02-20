@@ -161,6 +161,15 @@ type DownstreamConnectionStatus struct {
 	Channels []DownstreamChannelInfo
 }
 
+// UpstreamConnectionStatus contains Cable Modem Connection status
+// pertaining to the upstream channels of the connection.
+type UpstreamConnectionStatus struct {
+	// Primary upstream channel ID.
+	ChannelID uint32
+	// Upstream channel information.
+	Channels []UpstreamChannelInfo
+}
+
 // ConnectionStatus contains Cable Modem Connection status.
 type ConnectionStatus struct {
 	// Current system time on the device when the query was run.
@@ -173,10 +182,8 @@ type ConnectionStatus struct {
 	InternetConnected bool
 	// Downstream connection status.
 	Downstream DownstreamConnectionStatus
-	// Primary upstream channel ID.
-	UpstreamChannelID uint32
-	// Upstream channel information.
-	UpstreamChannels []UpstreamChannelInfo
+	// Upstream connection status.
+	Upstream UpstreamConnectionStatus
 }
 
 // LogEntry contains Cable Modem Log entry.

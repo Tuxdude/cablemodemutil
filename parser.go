@@ -342,7 +342,6 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	var err error
 	conn := actionResp(status["GetCustomerStatusConnectionInfoResponse"])
 	dev := actionResp(status["GetArrisDeviceStatusResponse"])
-	config := actionResp(status["GetArrisConfigurationInfoResponse"])
 
 	result.SystemTime, err = parseSystemTimestamp(conn, "CustomerCurSystemTime", "Current System Time")
 	if err != nil {
@@ -374,11 +373,7 @@ func populateConnectionStatus(status CableModemRawStatus, result *ConnectionStat
 	if err != nil {
 		return err
 	}
-	result.UpstreamChannelID, err = parseChannelID(config, "UpstreamChannelId", "Upstream Channel ID")
-	if err != nil {
-		return err
-	}
-	result.UpstreamChannels, err = populateUpstreamChannels(status)
+	err = populateUpstreamConnectionStatus(status, &result.Upstream)
 	if err != nil {
 		return err
 	}
@@ -421,6 +416,22 @@ func populateDownstreamConnectionStatus(status CableModemRawStatus, result *Down
 	// GetArrisConfigurationInfoResponse.DownstreamFrequency (no HZ suffix in string)
 	// GetArrisDeviceStatusResponse.DownstreamFrequency (has HZ suffix in string)
 	// GetCustomerStatusStartupSequenceResponse.CustomerConnDSFreq (has HZ suffix in string)
+
+	return nil
+}
+
+func populateUpstreamConnectionStatus(status CableModemRawStatus, result *UpstreamConnectionStatus) error {
+	var err error
+	config := actionResp(status["GetArrisConfigurationInfoResponse"])
+
+	result.ChannelID, err = parseChannelID(config, "UpstreamChannelId", "Upstream Channel ID")
+	if err != nil {
+		return err
+	}
+	result.Channels, err = populateUpstreamChannels(status)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
