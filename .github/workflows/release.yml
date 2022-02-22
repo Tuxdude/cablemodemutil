@@ -30,6 +30,9 @@ jobs:
       - name: Fetch full annotated tags metadata
         run: git fetch --force --tags
 
+      - name: Set up makesystem
+        run: make makesystem_install
+
       - name: Set up Go
         uses: actions/setup-go@v2
         with:

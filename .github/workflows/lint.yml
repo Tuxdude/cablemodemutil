@@ -38,6 +38,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Fetch full annotated tags metadata
+        run: git fetch --force --tags
+
+      - name: Set up makesystem
+        run: make makesystem_install
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
