@@ -7,12 +7,17 @@ on:
       - master
     tags:
       - v*
+    paths-ignore:
+      - '**.md'
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - master
+    paths-ignore:
+      - '**.md'
   schedule:
     - cron: '00 03 * * *'
+  workflow_dispatch:
 
 jobs:
   analyze:
