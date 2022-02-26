@@ -23,17 +23,36 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  generate-os-matrix:
+    name: Generate OS Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      os-matrix: ${{ steps.set-os-matrix.outputs.os-matrix }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Fetch full annotated tags metadata
+        run: git fetch --force --tags
+
+      - name: Set up makesystem
+        run: make makesystem_install
+
+      - id: set-os-matrix
+        run: make github_dump_tests_os_matrix
+
+  tests:
     name: Tests
+    needs: generate-os-matrix
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
+        os:  ${{fromJSON(needs.generate-os-matrix.outputs.os-matrix)}}
 
     steps:
       - name: Checkout repository
