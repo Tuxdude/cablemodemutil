@@ -82,7 +82,7 @@ jobs:
         run: go test -v ./...
 
       - name: Upload Test coverage to Codecov (Linux / OSX)
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         # Do not upload coverage on Windows, as there
         # will be no coverage data generated.
         if: ${{ matrix.os != 'windows-latest' }}
