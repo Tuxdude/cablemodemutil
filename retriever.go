@@ -42,8 +42,6 @@ var statusSubCommands = []string{
 	// Just contains 'XXX' (Not useful).
 	"GetCustomerStatusXXX",
 	// Just contains 'XXX' (Not useful).
-	"GetArrisXXX",
-	// Just contains 'XXX' (Not useful).
 	"GetCustomerStatusLogXXX",
 }
 
