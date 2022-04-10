@@ -39,10 +39,6 @@ var statusSubCommands = []string{
 	"GetCustomerStatusSecAccount",
 	// Ask me later and never ask (Not so useful).
 	"GetArrisRegisterStatus",
-	// Just contains 'XXX' (Not useful).
-	"GetCustomerStatusXXX",
-	// Just contains 'XXX' (Not useful).
-	"GetCustomerStatusLogXXX",
 }
 
 // Retriever is used to retrieve the current status of the Cable Modem.
