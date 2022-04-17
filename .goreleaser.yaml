@@ -99,7 +99,8 @@ release:
   mode: keep-existing
   header: |
     ## Released {{ time "Mon, Jan 2 2006 03:04 PM UTC-0700" }}
-    {{ .TagContents }}
+    {{ .TagSubject }}
+    {{ .TagBody }}
   footer: |
     ## Thanks!
     Those include all the new changes in the {{ .Tag }} release!
