@@ -45,7 +45,7 @@ jobs:
           passphrase: ${{ secrets.RELEASE_SIGNING_GPG_PASSPHRASE }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
           version: latest
