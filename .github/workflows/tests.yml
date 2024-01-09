@@ -80,14 +80,3 @@ jobs:
         # generation command fails on Windows.
         if: ${{ matrix.os == 'windows-latest' }}
         run: go test -v ./...
-
-      - name: Upload Test coverage to Codecov (Linux / OSX)
-        uses: codecov/codecov-action@v3
-        # Do not upload coverage on Windows, as there
-        # will be no coverage data generated.
-        if: ${{ matrix.os != 'windows-latest' }}
-        with:
-          files: coverage.out
-          fail_ci_if_error: true
-          flags: unittests
-          verbose: true
