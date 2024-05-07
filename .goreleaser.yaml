@@ -57,7 +57,7 @@ universal_binaries:
 source:
   enabled: true
   name_template: "{{ .ProjectName }}-v{{ .Version }}-src"
-  format: tar.xz
+  format: tar.gz
 checksum:
   # Checksum configuration.
   name_template: 'checksums.txt'
