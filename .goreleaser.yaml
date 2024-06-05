@@ -1,3 +1,4 @@
+version: 2
 before:
   hooks:
     # Run all pre-checks before goreleaser cuts a release.
