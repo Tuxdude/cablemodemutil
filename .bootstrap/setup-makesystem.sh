@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e -o pipefail
+set -E -e -o pipefail
 
 ver="${1:?}"
 makesystem_dir="${2:?}"
