@@ -3,7 +3,7 @@ BOOTSTRAP_MAKESYSTEM_MK := 1
 
 MAKESYSTEM_BASE_DIR ?= ./.makesystem
 
-SHELL := /bin/bash -e -o pipefail
+SHELL := /bin/bash -E -e -o pipefail
 
 ifneq ("$(wildcard $(MAKESYSTEM_BASE_DIR)/.id)","")
     MAKESYSTEM_FOUND := 1
