@@ -83,7 +83,7 @@ gomod:
   gobinary: go
 snapshot:
   # Custom naming for snapshot builds.
-  name_template: "{{ incpatch .Version }}-dev-{{ .ShortCommit }}"
+  version_template: "{{ incpatch .Version }}-dev-{{ .ShortCommit }}"
 changelog:
   use: github
   sort: asc
