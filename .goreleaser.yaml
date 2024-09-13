@@ -17,9 +17,9 @@ builds:
       - -s -w
       # Include version and commit information (uses commit date for
       # reproducible builds).
-      - -X main.version={{.Version}}
-      - -X main.commit={{.Commit}}
-      - -X main.date={{.CommitDate}}
+      - -X main.pkgVersion={{.Version}}
+      - -X main.pkgCommit={{.ShortCommit}}
+      - -X main.pkgTimestamp={{.CommitDate}}
     # Use the commit timestamp as the binary's modified timestamp.
     mod_timestamp: '{{ .CommitTimestamp }}'
     # Set to true only for library projects.
