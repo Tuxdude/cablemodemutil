@@ -1,0 +1,76 @@
+---
+name: Snapshot Release
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  schedule:
+    - cron: '00 03 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot-release:
+    name: Snapshot Release
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # We need to do this because of:
+      # https://github.com/actions/checkout/issues/290 and its side-effects
+      # as https://github.com/goreleaser/goreleaser/issues/2919
+      - name: Fetch full annotated tags metadata
+        run: git fetch --force --tags
+
+      - name: Set up makesystem
+        run: make makesystem_install
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+
+      - name: Generate Artifact Name
+        id: generate-artifact-name
+        # REPO_NAME_WITHOUT_OWNER-snapshot-REF_NAME-GIT_SHORT_HASH
+        run: echo "artifact=$(basename $(echo ${{github.repository}}))-snapshot-$(echo ${{github.ref_name}} | tr / -)-$(git rev-parse --short --verify ${{github.sha}})" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          install-only: true
+
+      - name: Run GoReleaser Snapshot Release Without Signing
+        run: make goreleaser_snapshot_release_skip_signing
+
+      - name: Upload Snapshot Release to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.generate-artifact-name.outputs.artifact }}
+          path: |
+            dist/metadata.json
+            dist/*.zip
+            dist/*.tar.xz
+            dist/*.tar.gz
+          if-no-files-found: error

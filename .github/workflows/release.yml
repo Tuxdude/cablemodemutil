@@ -44,11 +44,14 @@ jobs:
           gpg_private_key: ${{ secrets.RELEASE_SIGNING_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.RELEASE_SIGNING_GPG_PASSPHRASE }}
 
-      - name: Run GoReleaser
+      - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
-          args: release --clean
+          version: '~> v2'
+          install-only: true
+
+      - name: Run GoReleaser
+        run: make goreleaser_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
